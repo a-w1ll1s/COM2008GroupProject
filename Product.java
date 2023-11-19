@@ -3,7 +3,7 @@
  * Product creates Product objects that are a part of the Inventory.
  * They describe the general product, not a single instance.
  * 
- * Adam Willis, Novemeber 2023
+ * Adam Willis, November 2023
  */
 
 public class Product {

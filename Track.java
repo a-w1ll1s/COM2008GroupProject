@@ -2,7 +2,7 @@
 /**
  * Track creates Track objects that are subclasses of Products.
  * 
- * Adam Willis, Novemeber 2023
+ * Adam Willis, November 2023
  */
 
 public class Track extends Product{
