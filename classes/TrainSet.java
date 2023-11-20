@@ -1,14 +1,15 @@
+package classes;
 
 /**
- * TrackPack creates TrackPack objects that are subclasses of Products.
+ * TrainSet creates TrainSet objects that are subclasses of Products.
  * 
  * Adam Willis, November 2023
  */
 
-public class TrackPack extends Product{
+public class TrainSet extends Product{
 
     //Constructor
-    public TrackPack (int productID, String productCode, String manufacturer, 
+    public TrainSet (int productID, String productCode, String manufacturer, 
                             String name, int price, String gauge) {
         
         super(productID,productCode,manufacturer,name,price,gauge);

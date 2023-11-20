@@ -1,3 +1,4 @@
+package classes;
 
 /**
  * Locomotive creates Locomotive objects that are subclasses of Products.
@@ -32,8 +33,9 @@ public class Locomotive extends Product{
         String str = "";
         
         str += super.toString();
-        str += ", DCC Code: " + codeDCC;
-        str += ", Era: " + era;
+        str += ", DCC Code: " + getCodeDCC();
+        str += ", Era: " + getEra();
+        str += "}";
 
         return str;
     }  

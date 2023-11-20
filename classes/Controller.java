@@ -1,3 +1,4 @@
+package classes;
 
 /**
  * Controller creates Controller objects that are subclasses of Products.
@@ -26,7 +27,8 @@ public class Controller extends Product{
         String str = "";
         
         str += super.toString();
-        str += ", Digital: " + digital;
+        str += ", Digital: " + isDigital();
+        str += "}";
 
         return str;
     }    

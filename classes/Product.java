@@ -1,3 +1,4 @@
+package classes;
 
 /**
  * Product creates Product objects that are a part of the Inventory.
@@ -55,12 +56,13 @@ public class Product {
     public String toString() {
         String str = "";
 
-        str += "ID: " + productID;
-        str += ", Code: " + productCode;
-        str += ", Manufacturer: " + manufacturer;
-        str += ", Name: " + name;
-        str += ", Price: £" + price;
-        str += ", Gauge: " + gauge;
+        str += "{ID: " + getProductID();
+        str += ", Code: " + getProductCode();
+        str += ", Manufacturer: " + getManufacturer();
+        str += ", Name: " + getName();
+        str += ", Price: £" + getPrice();
+        str += ", Gauge: " + getGauge();
+        str += "}";
 
         return str;
     }

@@ -1,3 +1,4 @@
+package classes;
 
 /**
  * RollingStock creates RollingStock objects that are subclasses of Products.
@@ -32,8 +33,9 @@
         String str = "";
         
         str += super.toString();
-        str += ", Era: " + era;
-        str += ", Carriage: " + isCarriage;
+        str += ", Era: " + getEra();
+        str += ", Carriage: " + isCarriage();
+        str += "}";
 
         return str;
     }  
