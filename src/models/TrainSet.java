@@ -1,4 +1,4 @@
-package classes;
+package models;
 
 /**
  * TrainSet creates TrainSet objects that are subclasses of Products.

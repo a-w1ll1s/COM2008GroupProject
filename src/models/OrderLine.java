@@ -1,4 +1,4 @@
-package classes;
+package models;
 
 /**
  * OrderLine creates OrderLine objects that describe one order line.

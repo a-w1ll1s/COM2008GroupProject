@@ -1,4 +1,4 @@
-package classes;
+package models;
 
 /**
  * RollingStock creates RollingStock objects that are subclasses of Products.

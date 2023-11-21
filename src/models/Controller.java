@@ -1,4 +1,4 @@
-package classes;
+package models;
 
 /**
  * Controller creates Controller objects that are subclasses of Products.

@@ -1,4 +1,4 @@
-package classes;
+package models;
 
 /**
  * Product creates Product objects that are a part of the Inventory.

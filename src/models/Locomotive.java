@@ -1,4 +1,4 @@
-package classes;
+package models;
 
 /**
  * Locomotive creates Locomotive objects that are subclasses of Products.

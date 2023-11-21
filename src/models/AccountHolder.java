@@ -1,4 +1,4 @@
-package classes;
+package models;
 
 /**
  * AccountHolder creates AccountHolder objects that describe the holder of an account.

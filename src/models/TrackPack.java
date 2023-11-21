@@ -1,4 +1,4 @@
-package classes;
+package models;
 
 /**
  * TrackPack creates TrackPack objects that are subclasses of Products.

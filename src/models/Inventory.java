@@ -1,4 +1,4 @@
-package classes;
+package models;
 
 /**
  * Inventory creates Inventory objects.

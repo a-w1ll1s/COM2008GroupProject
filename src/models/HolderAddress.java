@@ -1,4 +1,4 @@
-package classes;
+package models;
 
 /**
  * HolderAddress creates HolderAddress objects that describe the address of a holder.

@@ -1,4 +1,4 @@
-package classes;
+package models;
 
 /**
  * Account creates Account objects that describe one account.
