@@ -1,4 +1,4 @@
-package models;
+package models.business;
 
 /**
  * Customer creates Customer objects that are subclasses of Accounts.

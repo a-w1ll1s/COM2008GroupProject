@@ -1,4 +1,4 @@
-package models;
+package models.business;
 
 /**
  * AccountHolder creates AccountHolder objects that describe the holder of an account.

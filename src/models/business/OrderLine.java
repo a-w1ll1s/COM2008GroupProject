@@ -1,4 +1,4 @@
-package models;
+package models.business;
 
 /**
  * OrderLine creates OrderLine objects that describe one order line.

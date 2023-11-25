@@ -1,4 +1,4 @@
-package models;
+package models.business;
 
 /**
  * Locomotive creates Locomotive objects that are subclasses of Products.

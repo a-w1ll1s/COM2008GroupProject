@@ -1,4 +1,4 @@
-package models;
+package models.business;
 
 /**
  * Staff creates Staff objects that are subclasses of Accounts.

@@ -1,4 +1,4 @@
-package models;
+package models.business;
 
 /**
  * HolderAddress creates HolderAddress objects that describe the address of a holder.

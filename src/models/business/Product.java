@@ -1,4 +1,4 @@
-package models;
+package models.business;
 
 /**
  * Product creates Product objects that are a part of the Inventory.
