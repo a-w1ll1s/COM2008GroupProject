@@ -4,6 +4,12 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
+/**
+ * DatabaseConnection handles the connection to the database.
+ * 
+ * Adam Willis, November 2023
+ */
+
 public class DatabaseConnection {
 
     private static final String URL = "jdbc:mysql://stusql.dcs.shef.ac.uk:3306/team028";

@@ -1,5 +1,4 @@
 package models.database;
-
 import models.business.*;
 
 import java.sql.Connection;
@@ -7,6 +6,12 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+
+/**
+ * DatabaseMethods handles the interactions with the database.
+ * 
+ * Adam Willis, November 2023
+ */
 
 public class DatabaseMethods {
 
