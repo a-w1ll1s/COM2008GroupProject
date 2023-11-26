@@ -25,6 +25,18 @@ public class Main {
             for (Product x : products) {
                 System.out.println(x.toString());
             }
+
+            ArrayList<Customer> customers = databaseMethods.getCustomerDetails(databaseConnection.getConnection()); 
+
+            for (Customer x : customers) {
+                System.out.println(x.toString());
+            }
+
+            ArrayList<Staff> staffs = databaseMethods.getStaffDetails(databaseConnection.getConnection()); 
+
+            for (Staff x : staffs) {
+                System.out.println(x.toString());
+            }
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
