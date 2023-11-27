@@ -229,4 +229,118 @@ public final class DatabaseMethods {
             statement.executeUpdate();
         }
     }
+
+    public Product findProduct(Connection connection, int currentID) throws SQLException {
+
+        try {
+            String selectStatement = "SELECT * FROM `Product` WHERE productID = ?";
+            PreparedStatement preparedStatement = connection.prepareStatement(selectStatement);
+            preparedStatement.setInt(1, currentID);
+            ResultSet result = preparedStatement.executeQuery();
+            
+
+            while(result.next()) {
+                Product product = new Product( 
+                result.getInt("productID"),
+                result.getString("productCode"), 
+                result.getString("manufacturer"),
+                result.getString("name"),
+                result.getInt("price"),
+                result.getString("gauge")
+                );
+
+                return product;
+            }
+
+            return null;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw e;
+        }
+    }
+
+    public ArrayList<Product> getTrackPackParts(Connection connection, Product set) throws SQLException {
+
+        try {
+
+            ArrayList<Product> parts = new ArrayList<>();
+
+            int setID = set.getProductID();
+            String setCode = set.getProductCode();
+
+            if (setCode.equals("P")) {
+                String selectStatement = "SELECT * FROM `HasTrack` WHERE setID = ?";
+                PreparedStatement preparedStatement = connection.prepareStatement(selectStatement);
+                preparedStatement.setInt(1, setID);
+                ResultSet results = preparedStatement.executeQuery();
+
+                while(results.next()) {
+                    parts.add(findProduct(connection, results.getInt("partID")));
+                }
+            }
+
+            return parts;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw e;
+        }
+    }
+
+    public ArrayList<Product> getTrainSetParts(Connection connection, Product set) throws SQLException {
+
+        try {
+
+            ArrayList<Product> parts = new ArrayList<>();
+
+            int setID = set.getProductID();
+            String setCode = set.getProductCode();
+
+            if (setCode.equals("M")) {
+                String rollingStockStatement = "SELECT * FROM `HasRollingStock` WHERE setID = ?";
+                PreparedStatement rollingStockPrepared = connection.prepareStatement(rollingStockStatement);
+                rollingStockPrepared.setInt(1, setID);
+                ResultSet rollingStockResults = rollingStockPrepared.executeQuery();
+
+                while(rollingStockResults.next()) {
+                    parts.add(findProduct(connection, rollingStockResults.getInt("partID")));
+                }
+
+                String locomotiveStatement = "SELECT * FROM `HasLocomotive` WHERE setID = ?";
+                PreparedStatement locomotivePrepared = connection.prepareStatement(locomotiveStatement);
+                locomotivePrepared.setInt(1, setID);
+                ResultSet locomotiveResults = locomotivePrepared.executeQuery();
+
+                while(locomotiveResults.next()) {
+                    parts.add(findProduct(connection, locomotiveResults.getInt("partID")));
+                }
+
+                String trackPackStatement = "SELECT * FROM `HasTrackPack` WHERE setID = ?";
+                PreparedStatement trackPackPrepared = connection.prepareStatement(trackPackStatement);
+                trackPackPrepared.setInt(1, setID);
+                ResultSet trackPackResults = trackPackPrepared.executeQuery();
+
+                while(trackPackResults.next()) {
+                    Product trackPack = findProduct(connection, trackPackResults.getInt("partID"));
+                    parts.addAll(getTrackPackParts(connection, trackPack));
+                }
+
+                String controllerStatement = "SELECT * FROM `Train Sets` WHERE productID = ?";
+                PreparedStatement controllerPrepared = connection.prepareStatement(controllerStatement);
+                controllerPrepared.setInt(1, setID);
+                ResultSet controllerResults = controllerPrepared.executeQuery();
+
+                while(controllerResults.next()) {
+                    parts.add(findProduct(connection, controllerResults.getInt("controllerID")));
+                }
+            }
+
+            return parts;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw e;
+        }
+    }
 }
