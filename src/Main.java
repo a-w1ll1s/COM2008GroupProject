@@ -1,4 +1,4 @@
-import gui.MainFrame;
+import views.MainFrame;
 
 /**
  * Main is the program entry.
