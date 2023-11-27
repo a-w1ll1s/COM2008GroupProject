@@ -1,8 +1,10 @@
-package views;
+package views.customer;
 
 import java.awt.*;
 
 import javax.swing.*;
+
+import views.MainFrame;
 
 class CustomerPanel extends JPanel {
     private MainFrame parentFrame;
@@ -10,5 +12,9 @@ class CustomerPanel extends JPanel {
     public CustomerPanel(MainFrame frame) {        
         parentFrame = frame;
         setLayout(new GridBagLayout());
+
+        
+
+        
     }
 }

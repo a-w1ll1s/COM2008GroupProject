@@ -188,7 +188,6 @@ public final class DatabaseMethods {
             if (!results.next()) {
                 return null;
             }
-            //results.first();
 
             int userID = results.getInt("userID");
             String password = results.getString("password");

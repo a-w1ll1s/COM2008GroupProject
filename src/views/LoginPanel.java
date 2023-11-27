@@ -5,12 +5,10 @@ import java.awt.event.ActionEvent;
 import java.sql.SQLException;
 
 import javax.swing.*;
-import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
 
 import helpers.FormHelpers;
 import models.business.Account;
-import models.business.Customer;
 import models.database.DatabaseConnection;
 import models.database.DatabaseMethods;
 
@@ -29,7 +27,7 @@ class LoginPanel extends JPanel {
         // Login Panel 
         JPanel loginPanel = new JPanel();
         loginPanel.setLayout(new GridBagLayout());
-        loginPanel.setBackground(Color.LIGHT_GRAY);
+        loginPanel.setBackground(StyleConstants.SECTION_COLOUR);
         loginPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
 
         GridBagConstraints loginPanelConstraints = FormHelpers.getGridBagConstraints(0, 0);
@@ -163,7 +161,7 @@ class LoginPanel extends JPanel {
             return;
         } 
 
-        // Successful login so show customer dashboard
-        parentFrame.showPage(new CustomerPanel(parentFrame));
+        // Successful login so show the dashboard
+        parentFrame.showPage(new DashboardPanel(parentFrame, account));
     }
 }

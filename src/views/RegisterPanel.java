@@ -7,6 +7,7 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 
 import helpers.FormHelpers;
+import views.DashboardPanel;
 
 class RegisterPanel extends JPanel {
     private MainFrame parentFrame;
@@ -27,7 +28,7 @@ class RegisterPanel extends JPanel {
         // Register Panel 
         JPanel registerPanel = new JPanel();
         registerPanel.setLayout(new GridBagLayout());
-        registerPanel.setBackground(Color.LIGHT_GRAY);
+        registerPanel.setBackground(StyleConstants.SECTION_COLOUR);
         registerPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
 
         
@@ -261,21 +262,16 @@ class RegisterPanel extends JPanel {
 
         if (missingData)
             return;
-
-
-        // TODO: check if email already exists
-        if (email.equals("test")) {
-            emailErrorLabel.setText("Email already registered");
-            return;
+        
+        // Check email format
+        if (!(email.contains("@") && email.contains((".")))) {
+            emailErrorLabel.setText("Invalid email");
         }
 
-        if (password.equals("test")) {
-            passwordErrorLabel.setText("Password is wrong");
-            return;
-        }
+        // TODO: Sort registering...
 
         // Successful register so automatically login.
-        parentFrame.showPage(new CustomerPanel(parentFrame));
+        //parentFrame.showPage(new CustomerPanel(parentFrame));
     }
 
     

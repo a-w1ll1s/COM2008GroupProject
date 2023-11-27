@@ -44,9 +44,7 @@ public class Main {
 
         // Display the ManagerView with customer and staff data
         //SwingUtilities.invokeLater(() -> new ManagerView(customers, staffs));
-        //SwingUtilities.invokeLater(() -> new ManagerView(customers, staffs));
 
         SwingUtilities.invokeLater(() -> new MainFrame("Application"));
-
     }
 }
