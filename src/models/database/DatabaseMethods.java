@@ -296,4 +296,52 @@ public class DatabaseMethods {
             throw e;
         }
     }
+
+    public void addProduct(Connection connection, int productID, String productCode, String manufacturer, String name, int price, String gauge) throws SQLException {
+        String insertStatement = "INSERT INTO Product (productID, productCode, manufacturer, name, price, gauge) VALUES (?, ?, ?, ?, ?, ?)";
+        try (PreparedStatement preparedStatement = connection.prepareStatement(insertStatement)) {
+            preparedStatement.setInt(1, productID);
+            preparedStatement.setString(2, productCode);
+            preparedStatement.setString(3, manufacturer);
+            preparedStatement.setString(4, name);
+            preparedStatement.setInt(5, price);
+            preparedStatement.setString(6, gauge);
+    
+            preparedStatement.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw e;
+        }
+    }
+    
+
+    public void editProduct(Connection connection, int productID, String productCode, String manufacturer, String name, int price, String gauge) throws SQLException {
+        String updateStatement = "UPDATE Product SET productCode = ?, manufacturer = ?, name = ?, price = ?, gauge = ? WHERE productID = ?";
+        try (PreparedStatement preparedStatement = connection.prepareStatement(updateStatement)) {
+            preparedStatement.setString(1, productCode);
+            preparedStatement.setString(2, manufacturer);
+            preparedStatement.setString(3, name);
+            preparedStatement.setInt(4, price);
+            preparedStatement.setString(5, gauge);
+            preparedStatement.setInt(6, productID);
+    
+            preparedStatement.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw e;
+        }
+    }
+
+    public void deleteProduct(Connection connection, int productID) throws SQLException {
+        String deleteStatement = "DELETE FROM Product WHERE productID = ?";
+        try (PreparedStatement preparedStatement = connection.prepareStatement(deleteStatement)) {
+            preparedStatement.setInt(1, productID);
+            preparedStatement.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw e;
+        }
+    }
+    
+    
 }
