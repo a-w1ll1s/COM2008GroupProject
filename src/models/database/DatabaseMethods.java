@@ -342,6 +342,38 @@ public class DatabaseMethods {
             throw e;
         }
     }
+
+    public void addBankDetails(Connection connection, String accountNumber, String sortCode, String bankName, int holderID) throws SQLException {
+        String insertStatement = "INSERT INTO BankDetails (accountNumber, sortCode, bankName, holderID) VALUES (?, ?, ?, ?)";
+        try (PreparedStatement preparedStatement = connection.prepareStatement(insertStatement)) {
+            preparedStatement.setString(1, accountNumber);
+            preparedStatement.setString(2, sortCode);
+            preparedStatement.setString(3, bankName);
+            preparedStatement.setInt(4, holderID);
+    
+            preparedStatement.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw e;
+        }
+    }
+
+    public void editBankDetails(Connection connection, String accountNumber, String newSortCode, String newBankName, int holderID) throws SQLException {
+        String updateStatement = "UPDATE BankDetails SET sortCode = ?, bankName = ? WHERE accountNumber = ? AND holderID = ?";
+        try (PreparedStatement preparedStatement = connection.prepareStatement(updateStatement)) {
+            preparedStatement.setString(1, newSortCode);
+            preparedStatement.setString(2, newBankName);
+            preparedStatement.setString(3, accountNumber);
+            preparedStatement.setInt(4, holderID);
+    
+            preparedStatement.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw e;
+        }
+    }
+    
+    
     
     
 }
