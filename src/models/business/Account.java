@@ -69,7 +69,7 @@ public class Account {
         str += "{ID: " + getUserID();
         str += ", Email: " + getEmail();
         str += ", Customer: " + isCustomer();
-        str += ", Staff: £" + isStaff();
+        str += ", Staff: " + isStaff();
         str += ", Manager: " + isManager();
         str += ", Holder: " + getHolder().toString();
         str += "}";
