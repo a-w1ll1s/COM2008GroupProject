@@ -2,12 +2,17 @@ package views;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.sql.SQLException;
 
 import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
 
 import helpers.FormHelpers;
+import models.business.Account;
+import models.business.Customer;
+import models.database.DatabaseConnection;
+import models.database.DatabaseMethods;
 
 class LoginPanel extends JPanel {
     private MainFrame parentFrame;
@@ -87,7 +92,7 @@ class LoginPanel extends JPanel {
         submitPanel.setOpaque(false);
         
         loginButton = new JButton("Login");
-        loginButton.addActionListener(e -> TryLogin(e));
+        loginButton.addActionListener(e -> tryLogin(e));
         
         submitPanel.add(loginButton, BorderLayout.NORTH);
 
@@ -117,7 +122,7 @@ class LoginPanel extends JPanel {
         add(loginPanel, loginPanelConstraints);
         add(registerPanel, registerPanelConstraints);
     }
-    private void TryLogin(ActionEvent e) {
+    private void tryLogin(ActionEvent e) {
         // Clear previous errors
         emailErrorLabel.setText("");
         passwordErrorLabel.setText("");
@@ -132,16 +137,31 @@ class LoginPanel extends JPanel {
         if (missingData)
             return;
 
-        // TODO: Use email to get the password from the DB, if no email, tell user to register?
-        if (!email.equals("test")) {
-            emailErrorLabel.setText("Email not found");
+        // Try retrieve a matching account from the database
+        DatabaseConnection databaseConnection = new DatabaseConnection();
+        Account account = null;
+        try {
+            databaseConnection.openConnection();
+            account = DatabaseMethods.getAccountDetails(databaseConnection.getConnection(), email);
+        } 
+        catch (SQLException ex) {
+            JOptionPane.showMessageDialog(this, "Error getting account details: " + ex.getMessage());
+            return;
+        } 
+        finally {
+            databaseConnection.closeConnection();
+        }
+
+        // Check if we found an account
+        if (account == null) {
+            emailErrorLabel.setText("Email not registered");
             return;
         }
 
-        if (!password.equals("test")) {
-            passwordErrorLabel.setText("Password is wrong");
+        if (!account.getPassword().equals(password)) {
+            passwordErrorLabel.setText("Wrong password");
             return;
-        }
+        } 
 
         // Successful login so show customer dashboard
         parentFrame.showPage(new CustomerPanel(parentFrame));

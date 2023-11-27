@@ -1,4 +1,4 @@
-package models;
+package models.business;
 
 /**
  * Controller creates Controller objects that are subclasses of Products.

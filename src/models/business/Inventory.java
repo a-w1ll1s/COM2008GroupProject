@@ -1,4 +1,4 @@
-package models;
+package models.business;
 
 /**
  * Inventory creates Inventory objects.

@@ -1,4 +1,4 @@
-package models;
+package models.business;
 
 /**
  * Track creates Track objects that are subclasses of Products.

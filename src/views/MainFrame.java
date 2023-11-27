@@ -1,7 +1,12 @@
 package views;
 
 import java.awt.*;
+import java.util.ArrayList;
+
 import javax.swing.*;
+
+import models.business.Customer;
+import models.business.Staff;
 
 public class MainFrame extends JFrame {
     // Needed for serialisation
@@ -22,12 +27,10 @@ public class MainFrame extends JFrame {
         
         contentPane = getContentPane();
         contentPane.setLayout(new BorderLayout());
-        showPage(new LoginPanel(this));   
+        showPage(new LoginPanel(this));
     }
 
     public void showPage(JPanel panel) {
-        // TODO: Should pages like the login page be their own panel? Or something else? New frame?
-
         // Show the given page panel
         contentPane.removeAll();
         contentPane.add(panel, BorderLayout.CENTER);

@@ -1,4 +1,4 @@
-package models;
+package models.business;
 
 /**
  * Account creates Account objects that describe one account.

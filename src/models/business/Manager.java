@@ -1,4 +1,4 @@
-package models;
+package models.business;
 
 /**
  * Manager creates Manager objects that are subclasses of Accounts.
