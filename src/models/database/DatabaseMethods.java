@@ -166,4 +166,20 @@ public class DatabaseMethods {
         }
     
 }
+
+    public void promoteCustomerToStaff(Connection connection, int customerId) throws SQLException {
+        String updateQuery = "UPDATE Account SET isCustomer = TRUE, isStaff = TRUE WHERE userID = ?";
+        try (PreparedStatement statement = connection.prepareStatement(updateQuery)) {
+            statement.setInt(1, customerId);
+            statement.executeUpdate();
+        }
+    }
+
+    public void demoteStaffToCustomer(Connection connection, int staffId) throws SQLException {
+        String updateQuery = "UPDATE Account SET isStaff = FALSE, isCustomer = TRUE WHERE userID = ?";
+        try (PreparedStatement statement = connection.prepareStatement(updateQuery)) {
+            statement.setInt(1, staffId);
+            statement.executeUpdate();
+        }
+    }
 }
