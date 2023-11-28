@@ -1,6 +1,7 @@
 package models.database;
 import models.business.*;
 
+import java.sql.Statement;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -372,8 +373,148 @@ public class DatabaseMethods {
             throw e;
         }
     }
+
+    public void addProductToInventory(Connection connection, int productID, int stockLevel) throws SQLException {
+        String insertStatement = "INSERT INTO Inventory (productID, stockLevel) VALUES (?, ?)";
+        try (PreparedStatement preparedStatement = connection.prepareStatement(insertStatement)) {
+            preparedStatement.setInt(1, productID);
+            preparedStatement.setInt(2, stockLevel);
     
+            preparedStatement.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw e;
+        }
+    }
+
+    public ArrayList<Order> getPendingCustomerOrders(Connection connection, int userID) throws SQLException {
+        ArrayList<Order> customerOrders = new ArrayList<>();
     
+        String selectStatement = "SELECT * FROM `Order` WHERE userID = ? AND status = 'Pending'";
+        try (PreparedStatement preparedStatement = connection.prepareStatement(selectStatement)) {
+            preparedStatement.setInt(1, userID);
     
+            ResultSet results = preparedStatement.executeQuery();
+            while (results.next()) {
+                Order currentOrder = new Order(
+                    results.getInt("orderID"),
+                    results.getInt("userID"),
+                    results.getInt("date"),
+                    results.getString("status")
+                );
     
+                customerOrders.add(currentOrder);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw e;
+        }
+    
+        return customerOrders;
+    }
+
+    public ArrayList<Order> getPastCustomerOrders(Connection connection, int userID) throws SQLException {
+        ArrayList<Order> pastOrders = new ArrayList<>();
+    
+        String selectStatement = "SELECT * FROM `Order` WHERE userID = ? AND status = 'Fulfilled'";
+        try (PreparedStatement preparedStatement = connection.prepareStatement(selectStatement)) {
+            preparedStatement.setInt(1, userID);
+    
+            ResultSet results = preparedStatement.executeQuery();
+            while (results.next()) {
+                Order pastOrder = new Order(
+                    results.getInt("orderID"),
+                    results.getInt("userID"),
+                    results.getInt("date"),
+                    results.getString("status")
+                );
+    
+                pastOrders.add(pastOrder);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw e;
+        }
+    
+        return pastOrders;
+    }
+
+    public void editCustomerEmail(Connection connection, int userID, String newEmail) throws SQLException {
+        String updateEmailQuery = "UPDATE Account SET email = ? WHERE userID = ?";
+    
+        try (PreparedStatement emailStatement = connection.prepareStatement(updateEmailQuery)) {
+            emailStatement.setString(1, newEmail);
+            emailStatement.setInt(2, userID);
+            emailStatement.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw e;
+        }
+    }
+
+    public void editCustomerAddress(Connection connection, int holderID, HolderAddress newAddress) throws SQLException {
+        String updateAddressQuery = "UPDATE HolderAddress SET houseNum = ?, roadName = ?, cityName = ?, postcode = ? WHERE holderID = ?";
+    
+        try (PreparedStatement addressStatement = connection.prepareStatement(updateAddressQuery)) {
+            addressStatement.setString(1, newAddress.getHouseNum());
+            addressStatement.setString(2, newAddress.getRoadName());
+            addressStatement.setString(3, newAddress.getCityName());
+            addressStatement.setString(4, newAddress.getPostcode());
+            addressStatement.setInt(5, holderID);
+            addressStatement.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw e;
+        }
+    }
+    
+
+    public void registerUser(Connection connection, String email, String password, String forename, String surname, String houseNum, String roadName, String cityName, String postcode) throws SQLException {
+
+        connection.setAutoCommit(false);
+    
+        try {
+            String insertHolder = "INSERT INTO AccountHolder (forename, surname, houseNum, postcode) VALUES (?, ?, ?, ?)";
+            try (PreparedStatement holderStatement = connection.prepareStatement(insertHolder, Statement.RETURN_GENERATED_KEYS)) {
+                holderStatement.setString(1, forename);
+                holderStatement.setString(2, surname);
+                holderStatement.setString(3, houseNum);
+                holderStatement.setString(4, postcode);
+                holderStatement.executeUpdate();
+    
+                ResultSet holderKeys = holderStatement.getGeneratedKeys();
+                if (holderKeys.next()) {
+                    int holderID = holderKeys.getInt(1);
+    
+                    String insertAddress = "INSERT INTO HolderAddress (houseNum, roadName, cityName, postcode) VALUES (?, ?, ?, ?)";
+                    try (PreparedStatement addressStatement = connection.prepareStatement(insertAddress)) {
+                        addressStatement.setString(1, houseNum);
+                        addressStatement.setString(2, roadName);
+                        addressStatement.setString(3, cityName);
+                        addressStatement.setString(4, postcode);
+                        addressStatement.executeUpdate();
+                    }
+    
+                    String insertAccount = "INSERT INTO Account (email, password, holderID, isCustomer, isStaff, isAdmin) VALUES (?, ?, ?, TRUE, FALSE, FALSE)";
+                    try (PreparedStatement accountStatement = connection.prepareStatement(insertAccount)) {
+                        accountStatement.setString(1, email);
+                        accountStatement.setString(2, password); 
+                        accountStatement.setInt(3, holderID);
+                        accountStatement.executeUpdate();
+                    }
+                }
+            }
+    
+            connection.commit();
+    
+        } catch (SQLException e) {
+            connection.rollback();
+            e.printStackTrace();
+            throw e;
+        } finally {
+            connection.setAutoCommit(true);
+        }
+    }
+    
+
 }
