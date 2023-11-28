@@ -296,4 +296,72 @@ public class DatabaseMethods {
             throw e;
         }
     }
+
+    public void fulfillOrder(Connection connection, int orderId) throws SQLException {
+        String updateQuery = "UPDATE `Order` SET status = 'Fulfilled' WHERE orderID = ?";
+        try (PreparedStatement statement = connection.prepareStatement(updateQuery)) {
+            statement.setInt(1, orderId);
+            statement.executeUpdate();
+        }
+    }
+
+    public void deleteOrderLinesForOrder(Connection connection, int orderId) throws SQLException {
+        String deleteQuery = "DELETE FROM `Order Line` WHERE orderID = ?";
+        try (PreparedStatement statement = connection.prepareStatement(deleteQuery)) {
+            statement.setInt(1, orderId);
+            statement.executeUpdate();
+        }
+    }
+    
+
+    public void deleteOrder(Connection connection, int orderId) throws SQLException {
+        deleteOrderLinesForOrder(connection, orderId);
+        String deleteQuery = "DELETE FROM `Order` WHERE orderID = ?";
+        try (PreparedStatement statement = connection.prepareStatement(deleteQuery)) {
+            statement.setInt(1, orderId);
+            statement.executeUpdate();
+        }
+    }
+
+    public ArrayList<Order> getPendingOrders(Connection connection) throws SQLException {
+        ArrayList<Order> pendingOrders = new ArrayList<>();
+
+        String orderQuery = "SELECT * FROM `Order` WHERE status = 'Pending'";
+        try (PreparedStatement orderStatement = connection.prepareStatement(orderQuery)) {
+            ResultSet orderResultSet = orderStatement.executeQuery();
+
+            while (orderResultSet.next()) {
+                int orderID = orderResultSet.getInt("orderID");
+                int userID = orderResultSet.getInt("userID");
+                int date = orderResultSet.getInt("date");  
+                String status = orderResultSet.getString("status");
+
+                Order order = new Order(orderID, userID, date, status);
+                order.setOrderLines(getOrderLinesForOrder(connection, orderID));
+                pendingOrders.add(order);
+            }
+        }
+        return pendingOrders;
+    }
+
+    private ArrayList<OrderLine> getOrderLinesForOrder(Connection connection, int orderID) throws SQLException {
+        ArrayList<OrderLine> orderLines = new ArrayList<>();
+        String lineQuery = "SELECT * FROM `Order Line` WHERE orderID = ?";
+        try (PreparedStatement lineStatement = connection.prepareStatement(lineQuery)) {
+            lineStatement.setInt(1, orderID);
+            ResultSet lineResultSet = lineStatement.executeQuery();
+
+            while (lineResultSet.next()) {
+                int lineNum = lineResultSet.getInt("lineID");
+                int productID = lineResultSet.getInt("productID");
+                int quantity = lineResultSet.getInt("quantity");
+
+                Product product = findProduct(connection, productID); 
+                OrderLine line = new OrderLine(lineNum, product, quantity);
+                orderLines.add(line);
+            }
+        }
+        return orderLines;
+    }
+
 }

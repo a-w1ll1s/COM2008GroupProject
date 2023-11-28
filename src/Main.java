@@ -1,4 +1,5 @@
 import views.Manager.ManagerView;
+import views.Staff.PendingOrderQueueView;
 import models.database.*;
 import models.business.*;
 import java.sql.SQLException;
@@ -10,38 +11,29 @@ public class Main {
         DatabaseConnection databaseConnection = new DatabaseConnection();
         DatabaseMethods databaseMethods = new DatabaseMethods();
 
-        ArrayList<Customer> tempCustomers = new ArrayList<>();
-        ArrayList<Staff> tempStaffs = new ArrayList<>();
+        ArrayList<Customer> customers = new ArrayList<>();
+        ArrayList<Staff> staffs = new ArrayList<>();
+        ArrayList<Order> pendingOrders = new ArrayList<>();
 
         try {
             databaseConnection.openConnection();
 
-            // Fetch products, customers, and staff from the database
-            ArrayList<Product> products = databaseMethods.getProducts(databaseConnection.getConnection());
-            for (Product x : products) {
-                System.out.println(x.toString());
-            }
-
-            tempCustomers = databaseMethods.getCustomerDetails(databaseConnection.getConnection());
-            for (Customer x : tempCustomers) {
-                System.out.println(x.toString());
-            }
-
-            tempStaffs = databaseMethods.getStaffDetails(databaseConnection.getConnection());
-            for (Staff x : tempStaffs) {
-                System.out.println(x.toString());
-            }
-
+            // Fetch data from the database
+            customers.addAll(databaseMethods.getCustomerDetails(databaseConnection.getConnection()));
+            staffs.addAll(databaseMethods.getStaffDetails(databaseConnection.getConnection()));
+            pendingOrders.addAll(databaseMethods.getPendingOrders(databaseConnection.getConnection()));
+            System.out.println("Fetched orders: " + pendingOrders);
+            
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
             databaseConnection.closeConnection();
         }
 
-        final ArrayList<Customer> customers = tempCustomers;
-        final ArrayList<Staff> staffs = tempStaffs;
-
-        // Display the ManagerView with customer and staff data
-        SwingUtilities.invokeLater(() -> new ManagerView(customers, staffs));
+        // Display both ManagerView and PendingOrderQueueView
+        SwingUtilities.invokeLater(() -> {
+            new ManagerView(customers, staffs);
+            new PendingOrderQueueView(pendingOrders);
+        });
     }
 }
