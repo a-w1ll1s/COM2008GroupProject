@@ -495,7 +495,7 @@ public class DatabaseMethods {
                         addressStatement.executeUpdate();
                     }
     
-                    String insertAccount = "INSERT INTO Account (email, password, holderID, isCustomer, isStaff, isAdmin) VALUES (?, ?, ?, TRUE, FALSE, FALSE)";
+                    String insertAccount = "INSERT INTO Account (email, password, holderID, isCustomer, isStaff, isManager) VALUES (?, ?, ?, TRUE, FALSE, FALSE)";
                     try (PreparedStatement accountStatement = connection.prepareStatement(insertAccount)) {
                         accountStatement.setString(1, email);
                         accountStatement.setString(2, password); 
