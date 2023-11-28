@@ -3,6 +3,8 @@ package views.customer;
 import java.awt.*;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.swing.*;
 import javax.swing.border.Border;
@@ -14,6 +16,7 @@ import models.business.Locomotive;
 import models.business.Product;
 import models.business.RollingStock;
 import models.business.Track;
+import models.business.TrackPack;
 import views.CustomStyleConstants;
 
 class ProductPanel extends JPanel {
@@ -79,5 +82,47 @@ class ProductPanel extends JPanel {
     }
     public ProductPanel(Product product) {
         setup(product);
+    }
+
+    public ProductPanel(ArrayList<Product> pack) {
+        // From a pack type product where the pack product is the first in the list
+        setup(pack.get(0));
+
+        // Add a seperation line
+        add(new JLabel());
+        add(new JLabel());
+
+        ArrayList<Product> uniqueProducts = new ArrayList<>();
+        Map<Integer, Integer> itemCountMap = new HashMap<>();
+
+        // Count the number of occurences of each item in the pack
+        for (int i = 1; i < pack.size(); ++i) {
+            Product product = pack.get(i);
+            
+            Integer productID = product.getProductID();
+            if (itemCountMap.containsKey(productID)) {
+                itemCountMap.put(productID, itemCountMap.get(productID) + 1);
+            }
+            else {
+                itemCountMap.put(productID, 1);
+                uniqueProducts.add(product);
+            }
+        }
+        
+        // Display the pack contents
+        JLabel contentsLabel = new JLabel("Contains:");
+        contentsLabel.setFont(boldFont);
+        add(contentsLabel);
+        add(new JLabel());
+
+        for (Product product : uniqueProducts) {
+            System.out.println(product.getProductID() + " " + product.getName());
+            int count = itemCountMap.get(product.getProductID());
+            JLabel nameLabel = new JLabel(product.getName() + String.format(" x%d", count));
+            add(nameLabel);
+
+            JLabel manufacturerLabel = new JLabel("Manufactured by " + product.getManufacturer());
+            add(manufacturerLabel);
+        }
     }
 }

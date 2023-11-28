@@ -2,7 +2,6 @@ package views.customer;
 
 public interface ProductCategories {
     public static final String TRAIN_SETS = "Train Sets";
-    public static final String TRAIN_PACKS = "Train Packs";
     public static final String TRACK = "Track";
     public static final String TRACK_PACKS = "Track Packs";
     public static final String ROLLING_STOCK = "Rolling Stock";
@@ -11,9 +10,8 @@ public interface ProductCategories {
 
     public static final String[] categories = {
         TRAIN_SETS,
-        TRAIN_PACKS,
-        TRACK,
         TRACK_PACKS,
+        TRACK,
         ROLLING_STOCK,
         LOCOMOTIVES,
         CONTROLLERS

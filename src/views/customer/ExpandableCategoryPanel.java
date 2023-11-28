@@ -13,6 +13,7 @@ import models.business.Locomotive;
 import models.business.Product;
 import models.business.RollingStock;
 import models.business.Track;
+import models.business.TrackPack;
 import models.database.DatabaseConnection;
 import models.database.DatabaseMethods;
 import views.Manager.CustomerTableModel;
@@ -72,15 +73,25 @@ class ExpandableCategoryPanel extends JPanel {
                     
                     break;
                 
-                // TODO:
                 case ProductCategories.TRACK_PACKS:
-                    //DatabaseMethods.getTrackPackParts(connection);
-                    break;
+                    ArrayList<ArrayList<Product>> trackPacks = DatabaseMethods.getTrackPacks(
+                        databaseConnection.getConnection());
 
-                case ProductCategories.TRAIN_PACKS:
+                    for (int i = 0; i < trackPacks.size(); i++) {
+                        ArrayList<Product> pack = trackPacks.get(i);
+                        productContainerPanel.add(new ProductPanel(pack));
+                    }
+                    
                     break;
 
                 case ProductCategories.TRAIN_SETS:
+                    ArrayList<ArrayList<Product>> trainSets = DatabaseMethods.getTrainSets(
+                        databaseConnection.getConnection());
+
+                    for (int i = 0; i < trainSets.size(); i++) {
+                        ArrayList<Product> trainSet = trainSets.get(i);
+                        productContainerPanel.add(new ProductPanel(trainSet));
+                    }
                     break;                    
             }
         } 

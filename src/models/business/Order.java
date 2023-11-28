@@ -53,14 +53,14 @@ public class Order {
     }
 
     public int getOrderCost() {
-        int cost = 0;
-
+        int totalCost = 0;
         for (OrderLine line : orderLines) {
-            cost += line.getProduct().getPrice();
+            int lineCost = line.getProduct().getPrice() * line.getQuantity();
+            totalCost += lineCost;
         }
-
-        return cost;
+        return totalCost;
     }
+    
 
     public String toString() {
         String str = "";
@@ -74,4 +74,7 @@ public class Order {
         return str;
     }
 
+    public void setOrderLines(ArrayList<OrderLine> orderLines) {
+        this.orderLines = orderLines;
+    }
 }

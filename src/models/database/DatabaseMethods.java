@@ -1,6 +1,7 @@
 package models.database;
 import models.business.*;
 
+import java.sql.Statement;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -14,6 +15,19 @@ import java.util.ArrayList;
  */
 
 public final class DatabaseMethods {
+
+    public static Product getProductFromResult(ResultSet results) throws SQLException {
+        Product product = new Product( 
+            results.getInt("productID"),
+            results.getString("productCode"), 
+            results.getString("manufacturer"),
+            results.getString("name"),
+            results.getInt("price"),
+            results.getString("gauge")
+        );
+
+        return product;    
+    }
 
     public static ArrayList<Product> getProducts(Connection connection) throws SQLException {
 
@@ -260,6 +274,41 @@ public final class DatabaseMethods {
         }
     }
 
+    public static ArrayList<ArrayList<Product>> getTrackPacks(Connection connection) throws SQLException {
+        String selectStatement = "SELECT * FROM `Track Packs` "
+            + "JOIN Product ON Product.productID = `Track Packs`.productID";
+
+        PreparedStatement preparedStatement = connection.prepareStatement(selectStatement);
+        ResultSet results = preparedStatement.executeQuery();
+
+        ArrayList<ArrayList<Product>> trackPacks = new ArrayList<>();
+
+        // Get each track pack
+        while (results.next()) {
+            ArrayList<Product> products = new ArrayList<>();
+
+            TrackPack trackPackProduct = new TrackPack( 
+                results.getInt("productID"),
+                results.getString("productCode"), 
+                results.getString("manufacturer"),
+                results.getString("name"),
+                results.getInt("price"),
+                results.getString("gauge")
+            );
+
+            // Add the product as the first product in the track pack
+            products.add(trackPackProduct);
+
+            // Get each product in the track pack
+            // NOTE: BROKE THIS:
+            products.addAll(DatabaseMethods.getTrackPackParts(connection, trackPackProduct));
+
+            trackPacks.add(products);
+        }
+
+        return trackPacks;
+    }
+
     public static ArrayList<Product> getTrackPackParts(Connection connection, Product set) throws SQLException {
 
         try {
@@ -270,13 +319,17 @@ public final class DatabaseMethods {
             String setCode = set.getProductCode();
 
             if (setCode.equals("P")) {
-                String selectStatement = "SELECT * FROM `HasTrack` WHERE setID = ?";
+                String selectStatement = "SELECT * FROM `HasTrack` "
+                    + "JOIN Product ON Product.productID = `HasTrack`.partID "
+                    + "WHERE setID = ?";
+                    
                 PreparedStatement preparedStatement = connection.prepareStatement(selectStatement);
                 preparedStatement.setInt(1, setID);
                 ResultSet results = preparedStatement.executeQuery();
 
                 while(results.next()) {
-                    parts.add(findProduct(connection, results.getInt("partID")));
+                    Product product = getProductFromResult(results);
+                    parts.add(product);
                 }
             }
 
@@ -286,6 +339,40 @@ public final class DatabaseMethods {
             e.printStackTrace();
             throw e;
         }
+    }
+
+    public static ArrayList<ArrayList<Product>> getTrainSets(Connection connection) throws SQLException {
+        String selectStatement = "SELECT * FROM `Train Sets` "
+            + "JOIN Product ON Product.productID = `Train Sets`.productID";
+
+        PreparedStatement preparedStatement = connection.prepareStatement(selectStatement);
+        ResultSet results = preparedStatement.executeQuery();
+
+        ArrayList<ArrayList<Product>> trainSets = new ArrayList<>();
+
+        // Get each track pack
+        while (results.next()) {
+            ArrayList<Product> products = new ArrayList<>();
+
+            TrackPack trainSetProduct = new TrackPack( 
+                results.getInt("productID"),
+                results.getString("productCode"), 
+                results.getString("manufacturer"),
+                results.getString("name"),
+                results.getInt("price"),
+                results.getString("gauge")
+            );
+
+            // Add the parent product as the first product
+            products.add(trainSetProduct);
+
+            // Get each product in the track pack
+            products.addAll(DatabaseMethods.getTrainSetParts(connection, trainSetProduct));
+
+            trainSets.add(products);
+        }
+
+        return trainSets;
     }
 
     public static ArrayList<Product> getTrainSetParts(Connection connection, Product set) throws SQLException {
@@ -298,41 +385,53 @@ public final class DatabaseMethods {
             String setCode = set.getProductCode();
 
             if (setCode.equals("M")) {
-                String rollingStockStatement = "SELECT * FROM `HasRollingStock` WHERE setID = ?";
+                String rollingStockStatement = "SELECT * FROM `HasRollingStock` "
+                    + "JOIN Product ON Product.productID = `HasRollingStock`.partID "
+                    + "WHERE setID = ?";
+
                 PreparedStatement rollingStockPrepared = connection.prepareStatement(rollingStockStatement);
                 rollingStockPrepared.setInt(1, setID);
                 ResultSet rollingStockResults = rollingStockPrepared.executeQuery();
 
-                while(rollingStockResults.next()) {
-                    parts.add(findProduct(connection, rollingStockResults.getInt("partID")));
+                while(rollingStockResults.next()) {                    
+                    parts.add(getProductFromResult(rollingStockResults));
                 }
 
-                String locomotiveStatement = "SELECT * FROM `HasLocomotive` WHERE setID = ?";
+                String locomotiveStatement = "SELECT * FROM `HasLocomotive` "
+                    + "JOIN Product ON Product.productID = `HasLocomotive`.partID "
+                    + "WHERE setID = ?";
                 PreparedStatement locomotivePrepared = connection.prepareStatement(locomotiveStatement);
                 locomotivePrepared.setInt(1, setID);
                 ResultSet locomotiveResults = locomotivePrepared.executeQuery();
 
                 while(locomotiveResults.next()) {
-                    parts.add(findProduct(connection, locomotiveResults.getInt("partID")));
+                    parts.add(getProductFromResult(locomotiveResults));
                 }
 
-                String trackPackStatement = "SELECT * FROM `HasTrackPack` WHERE setID = ?";
+                String trackPackStatement = "SELECT * FROM `HasTrackPack` "
+                    + "JOIN Product ON Product.productID = `HasTrackPack`.partID "
+                    + "WHERE setID = ?";
                 PreparedStatement trackPackPrepared = connection.prepareStatement(trackPackStatement);
                 trackPackPrepared.setInt(1, setID);
                 ResultSet trackPackResults = trackPackPrepared.executeQuery();
 
                 while(trackPackResults.next()) {
-                    Product trackPack = findProduct(connection, trackPackResults.getInt("partID"));
+                    Product trackPack = getProductFromResult(trackPackResults);
+
+                    // TODO: Change to just return the track pack?
                     parts.addAll(getTrackPackParts(connection, trackPack));
+                    
                 }
 
-                String controllerStatement = "SELECT * FROM `Train Sets` WHERE productID = ?";
+                String controllerStatement = "SELECT * FROM `Train Sets` "
+                    + "JOIN Product ON Product.productID = `Train Sets`.productID "
+                    + "WHERE `Train Sets`.productID = ?";
                 PreparedStatement controllerPrepared = connection.prepareStatement(controllerStatement);
                 controllerPrepared.setInt(1, setID);
                 ResultSet controllerResults = controllerPrepared.executeQuery();
 
                 while(controllerResults.next()) {
-                    parts.add(findProduct(connection, controllerResults.getInt("controllerID")));
+                    parts.add(getProductFromResult(controllerResults));
                 }
             }
 
@@ -476,4 +575,293 @@ public final class DatabaseMethods {
             throw e;
         }
     }
+
+    public void fulfillOrder(Connection connection, int orderId) throws SQLException {
+        String updateQuery = "UPDATE `Order` SET status = 'Fulfilled' WHERE orderID = ?";
+        try (PreparedStatement statement = connection.prepareStatement(updateQuery)) {
+            statement.setInt(1, orderId);
+            statement.executeUpdate();
+        }
+    }
+
+    public void deleteOrderLinesForOrder(Connection connection, int orderId) throws SQLException {
+        String deleteQuery = "DELETE FROM `Order Line` WHERE orderID = ?";
+        try (PreparedStatement statement = connection.prepareStatement(deleteQuery)) {
+            statement.setInt(1, orderId);
+            statement.executeUpdate();
+
+        }
+    }
+    public void addProduct(Connection connection, int productID, String productCode, String manufacturer, String name, int price, String gauge) throws SQLException {
+        String insertStatement = "INSERT INTO Product (productID, productCode, manufacturer, name, price, gauge) VALUES (?, ?, ?, ?, ?, ?)";
+        try (PreparedStatement preparedStatement = connection.prepareStatement(insertStatement)) {
+            preparedStatement.setInt(1, productID);
+            preparedStatement.setString(2, productCode);
+            preparedStatement.setString(3, manufacturer);
+            preparedStatement.setString(4, name);
+            preparedStatement.setInt(5, price);
+            preparedStatement.setString(6, gauge);
+    
+            preparedStatement.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw e;
+        }
+    }
+    
+
+
+    public void deleteOrder(Connection connection, int orderId) throws SQLException {
+        deleteOrderLinesForOrder(connection, orderId);
+        String deleteQuery = "DELETE FROM `Order` WHERE orderID = ?";
+        try (PreparedStatement statement = connection.prepareStatement(deleteQuery)) {
+            statement.setInt(1, orderId);
+            statement.executeUpdate();
+        }
+    }
+
+    public ArrayList<Order> getPendingOrders(Connection connection) throws SQLException {
+        ArrayList<Order> pendingOrders = new ArrayList<>();
+
+        String orderQuery = "SELECT * FROM `Order` WHERE status = 'Pending'";
+        try (PreparedStatement orderStatement = connection.prepareStatement(orderQuery)) {
+            ResultSet orderResultSet = orderStatement.executeQuery();
+
+            while (orderResultSet.next()) {
+                int orderID = orderResultSet.getInt("orderID");
+                int userID = orderResultSet.getInt("userID");
+                int date = orderResultSet.getInt("date");  
+                String status = orderResultSet.getString("status");
+
+                Order order = new Order(orderID, userID, date, status);
+                order.setOrderLines(getOrderLinesForOrder(connection, orderID));
+                pendingOrders.add(order);
+            }
+        }
+        return pendingOrders;
+    }
+
+    private ArrayList<OrderLine> getOrderLinesForOrder(Connection connection, int orderID) throws SQLException {
+        ArrayList<OrderLine> orderLines = new ArrayList<>();
+        String lineQuery = "SELECT * FROM `Order Line` WHERE orderID = ?";
+        try (PreparedStatement lineStatement = connection.prepareStatement(lineQuery)) {
+            lineStatement.setInt(1, orderID);
+            ResultSet lineResultSet = lineStatement.executeQuery();
+
+            while (lineResultSet.next()) {
+                int lineNum = lineResultSet.getInt("lineID");
+                int productID = lineResultSet.getInt("productID");
+                int quantity = lineResultSet.getInt("quantity");
+
+                Product product = findProduct(connection, productID); 
+                OrderLine line = new OrderLine(lineNum, product, quantity);
+                orderLines.add(line);
+            }
+        }
+        return orderLines;
+    }
+
+
+    public void editProduct(Connection connection, int productID, String productCode, String manufacturer, String name, int price, String gauge) throws SQLException {
+        String updateStatement = "UPDATE Product SET productCode = ?, manufacturer = ?, name = ?, price = ?, gauge = ? WHERE productID = ?";
+        try (PreparedStatement preparedStatement = connection.prepareStatement(updateStatement)) {
+            preparedStatement.setString(1, productCode);
+            preparedStatement.setString(2, manufacturer);
+            preparedStatement.setString(3, name);
+            preparedStatement.setInt(4, price);
+            preparedStatement.setString(5, gauge);
+            preparedStatement.setInt(6, productID);
+    
+            preparedStatement.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw e;
+        }
+    }
+
+    public void deleteProduct(Connection connection, int productID) throws SQLException {
+        String deleteStatement = "DELETE FROM Product WHERE productID = ?";
+        try (PreparedStatement preparedStatement = connection.prepareStatement(deleteStatement)) {
+            preparedStatement.setInt(1, productID);
+            preparedStatement.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw e;
+        }
+    }
+
+    public void addBankDetails(Connection connection, String accountNumber, String sortCode, String bankName, int holderID) throws SQLException {
+        String insertStatement = "INSERT INTO BankDetails (accountNumber, sortCode, bankName, holderID) VALUES (?, ?, ?, ?)";
+        try (PreparedStatement preparedStatement = connection.prepareStatement(insertStatement)) {
+            preparedStatement.setString(1, accountNumber);
+            preparedStatement.setString(2, sortCode);
+            preparedStatement.setString(3, bankName);
+            preparedStatement.setInt(4, holderID);
+    
+            preparedStatement.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw e;
+        }
+    }
+
+    public void editBankDetails(Connection connection, String accountNumber, String newSortCode, String newBankName, int holderID) throws SQLException {
+        String updateStatement = "UPDATE BankDetails SET sortCode = ?, bankName = ? WHERE accountNumber = ? AND holderID = ?";
+        try (PreparedStatement preparedStatement = connection.prepareStatement(updateStatement)) {
+            preparedStatement.setString(1, newSortCode);
+            preparedStatement.setString(2, newBankName);
+            preparedStatement.setString(3, accountNumber);
+            preparedStatement.setInt(4, holderID);
+    
+            preparedStatement.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw e;
+        }
+    }
+
+    public void addProductToInventory(Connection connection, int productID, int stockLevel) throws SQLException {
+        String insertStatement = "INSERT INTO Inventory (productID, stockLevel) VALUES (?, ?)";
+        try (PreparedStatement preparedStatement = connection.prepareStatement(insertStatement)) {
+            preparedStatement.setInt(1, productID);
+            preparedStatement.setInt(2, stockLevel);
+    
+            preparedStatement.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw e;
+        }
+    }
+
+    public ArrayList<Order> getPendingCustomerOrders(Connection connection, int userID) throws SQLException {
+        ArrayList<Order> customerOrders = new ArrayList<>();
+    
+        String selectStatement = "SELECT * FROM `Order` WHERE userID = ? AND status = 'Pending'";
+        try (PreparedStatement preparedStatement = connection.prepareStatement(selectStatement)) {
+            preparedStatement.setInt(1, userID);
+    
+            ResultSet results = preparedStatement.executeQuery();
+            while (results.next()) {
+                Order currentOrder = new Order(
+                    results.getInt("orderID"),
+                    results.getInt("userID"),
+                    results.getInt("date"),
+                    results.getString("status")
+                );
+    
+                customerOrders.add(currentOrder);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw e;
+        }
+    
+        return customerOrders;
+    }
+
+    public ArrayList<Order> getPastCustomerOrders(Connection connection, int userID) throws SQLException {
+        ArrayList<Order> pastOrders = new ArrayList<>();
+    
+        String selectStatement = "SELECT * FROM `Order` WHERE userID = ? AND status = 'Fulfilled'";
+        try (PreparedStatement preparedStatement = connection.prepareStatement(selectStatement)) {
+            preparedStatement.setInt(1, userID);
+    
+            ResultSet results = preparedStatement.executeQuery();
+            while (results.next()) {
+                Order pastOrder = new Order(
+                    results.getInt("orderID"),
+                    results.getInt("userID"),
+                    results.getInt("date"),
+                    results.getString("status")
+                );
+    
+                pastOrders.add(pastOrder);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw e;
+        }
+    
+        return pastOrders;
+    }
+
+    public void editCustomerEmail(Connection connection, int userID, String newEmail) throws SQLException {
+        String updateEmailQuery = "UPDATE Account SET email = ? WHERE userID = ?";
+    
+        try (PreparedStatement emailStatement = connection.prepareStatement(updateEmailQuery)) {
+            emailStatement.setString(1, newEmail);
+            emailStatement.setInt(2, userID);
+            emailStatement.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw e;
+        }
+    }
+
+    public void editCustomerAddress(Connection connection, int holderID, HolderAddress newAddress) throws SQLException {
+        String updateAddressQuery = "UPDATE HolderAddress SET houseNum = ?, roadName = ?, cityName = ?, postcode = ? WHERE holderID = ?";
+    
+        try (PreparedStatement addressStatement = connection.prepareStatement(updateAddressQuery)) {
+            addressStatement.setString(1, newAddress.getHouseNum());
+            addressStatement.setString(2, newAddress.getRoadName());
+            addressStatement.setString(3, newAddress.getCityName());
+            addressStatement.setString(4, newAddress.getPostcode());
+            addressStatement.setInt(5, holderID);
+            addressStatement.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw e;
+        }
+    }
+    
+
+    public void registerUser(Connection connection, String email, String password, String forename, String surname, String houseNum, String roadName, String cityName, String postcode) throws SQLException {
+
+        connection.setAutoCommit(false);
+    
+        try {
+            String insertHolder = "INSERT INTO AccountHolder (forename, surname, houseNum, postcode) VALUES (?, ?, ?, ?)";
+            try (PreparedStatement holderStatement = connection.prepareStatement(insertHolder, Statement.RETURN_GENERATED_KEYS)) {
+                holderStatement.setString(1, forename);
+                holderStatement.setString(2, surname);
+                holderStatement.setString(3, houseNum);
+                holderStatement.setString(4, postcode);
+                holderStatement.executeUpdate();
+    
+                ResultSet holderKeys = holderStatement.getGeneratedKeys();
+                if (holderKeys.next()) {
+                    int holderID = holderKeys.getInt(1);
+    
+                    String insertAddress = "INSERT INTO HolderAddress (houseNum, roadName, cityName, postcode) VALUES (?, ?, ?, ?)";
+                    try (PreparedStatement addressStatement = connection.prepareStatement(insertAddress)) {
+                        addressStatement.setString(1, houseNum);
+                        addressStatement.setString(2, roadName);
+                        addressStatement.setString(3, cityName);
+                        addressStatement.setString(4, postcode);
+                        addressStatement.executeUpdate();
+                    }
+    
+                    String insertAccount = "INSERT INTO Account (email, password, holderID, isCustomer, isStaff, isManager) VALUES (?, ?, ?, TRUE, FALSE, FALSE)";
+                    try (PreparedStatement accountStatement = connection.prepareStatement(insertAccount)) {
+                        accountStatement.setString(1, email);
+                        accountStatement.setString(2, password); 
+                        accountStatement.setInt(3, holderID);
+                        accountStatement.executeUpdate();
+                    }
+                }
+            }
+    
+            connection.commit();
+    
+        } catch (SQLException e) {
+            connection.rollback();
+            e.printStackTrace();
+            throw e;
+        } finally {
+            connection.setAutoCommit(true);
+        }
+    }
+    
+
+
 }
