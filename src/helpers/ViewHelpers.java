@@ -4,7 +4,7 @@ import java.awt.GridBagConstraints;
 
 import javax.swing.JLabel;
 
-public class FormHelpers {
+public class ViewHelpers {
     public static GridBagConstraints getGridBagConstraints(int x, int y, Boolean fillHorizontal) {
         /* Helper function to create a GridBagConstraints object with the given
            row and column. Removes a lot of duplicated code and enables forms to
@@ -20,7 +20,7 @@ public class FormHelpers {
 
     public static GridBagConstraints getGridBagConstraints(int x, int y) {
         // Allows the fill parameter to not be given and instead the default fill is used
-        return FormHelpers.getGridBagConstraints(x, y, true);
+        return ViewHelpers.getGridBagConstraints(x, y, true);
     }
 
     public static Boolean setErrorIfEmpty(String value, JLabel errorLabel) {

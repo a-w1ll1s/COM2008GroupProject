@@ -1,53 +1,74 @@
 package views.customer;
 
 import java.awt.*;
-import java.sql.SQLException;
 
 import javax.swing.*;
 
-import helpers.FormHelpers;
-import models.database.DatabaseConnection;
 import views.MainFrame;
 
 public class ProductViewPanel extends JPanel {
     private MainFrame parentFrame;
-    
+    private ExpandableCategoryPanel selectedCategory;
+
     public ProductViewPanel(MainFrame frame) {        
         parentFrame = frame;
         setLayout(new GridBagLayout());
+        
+        // Category Buttons Panel
+        JPanel categoryButtonsPanel = new JPanel();
+        categoryButtonsPanel.setLayout(new GridBagLayout());
 
-        // Try get all the products of the given type from the database
-        DatabaseConnection databaseConnection = new DatabaseConnection();
-        try {
-            databaseConnection.openConnection();
-        } 
-        catch (SQLException ex) {
-            JOptionPane.showMessageDialog(this, "Error getting account details: " + ex.getMessage());
-            return;
-        } 
-        finally {
-            databaseConnection.closeConnection();
+        GridBagConstraints buttonConstraints = new GridBagConstraints();
+        buttonConstraints.fill = GridBagConstraints.BOTH;
+        buttonConstraints.weightx = 1;
+        buttonConstraints.weighty = 1;
+
+        // Create a button for each category
+        for (int i = 0; i < ProductCategories.categories.length; ++i) {
+            JButton button = new JButton(ProductCategories.categories[i]);
+            button.addActionListener(e -> {
+                JButton b = (JButton)e.getSource();
+                selectCategory(b.getText());
+            });
+
+            buttonConstraints.gridy = i;
+            categoryButtonsPanel.add(button, buttonConstraints);
         }
 
-
-
-
-        SelectCategoryButton trainSetCategoryButton = new ExpandableCategoryPanel(null);
-
-
-        ExpandableCategoryPanel trainSetCategoryPanel = new ExpandableCategoryPanel(parentFrame, "Train Sets");
-        add(trainSetCategoryPanel);
+        GridBagConstraints buttonsPanelConstraints = new GridBagConstraints();
+        buttonsPanelConstraints.fill = GridBagConstraints.BOTH;
+        buttonsPanelConstraints.weightx = 0.15;
+        buttonsPanelConstraints.weighty = 1;
         
+        add(categoryButtonsPanel, buttonsPanelConstraints);
         
 
-        ExpandableCategoryPanel trackPackCategoryPanel = new ExpandableCategoryPanel(parentFrame, "Track Packs");
-        add(trackPackCategoryPanel, FormHelpers.getGridBagConstraints(0, 1));
-
-        ExpandableCategoryPanel trackCategoryPanel = new ExpandableCategoryPanel(parentFrame, "Track");
-        add(trackCategoryPanel, FormHelpers.getGridBagConstraints(0, 2));
+        // Selected category products panel
+        selectCategory("Train Sets");
     }
 
     private void selectCategory(String category) {
+        // Remove throws error if the category wasn't actually selected.
+        try {
+            remove(selectedCategory);
+        }
+        catch (Exception e) {
+            
+        }
 
+        selectedCategory = new ExpandableCategoryPanel(null, category);
+        selectedCategory.setBackground(Color.YELLOW);
+
+        GridBagConstraints expandableCategoryPanelConstraints = new GridBagConstraints();
+        expandableCategoryPanelConstraints.fill = GridBagConstraints.BOTH;
+        expandableCategoryPanelConstraints.weightx = 1;
+        expandableCategoryPanelConstraints.weighty = 1;
+
+        add(selectedCategory, expandableCategoryPanelConstraints);
+
+
+        revalidate();
+        repaint();
+        setVisible(true);        
     }
 }

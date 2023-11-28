@@ -17,10 +17,10 @@ class NavigationBarPanel extends JPanel {
         this.account = account;
         setLayout(new GridLayout());        
 
-        setBackground(StyleConstants.SECTION_COLOUR);
+        setBackground(CustomStyleConstants.SECTION_COLOUR);
 
         JButton browserProductsButton = new JButton("Browser Products");
-        browserProductsButton.setBackground(StyleConstants.TOGGLED_NAV_BUTTON_COLOUR);
+        browserProductsButton.setBackground(CustomStyleConstants.TOGGLED_NAV_BUTTON_COLOUR);
         browserProductsButton.addActionListener(e -> {
             parentPanel.switchToProductsView();
         });

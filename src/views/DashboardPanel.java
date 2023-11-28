@@ -21,15 +21,32 @@ class DashboardPanel extends JPanel {
 
         // Navigation bar
         NavigationBarPanel navigationBarPanel = new NavigationBarPanel(parentFrame, this, account);
-        add(navigationBarPanel, BorderLayout.PAGE_START);
+        GridBagConstraints navigationBarConstraints = new GridBagConstraints();
+        navigationBarConstraints.fill = GridBagConstraints.HORIZONTAL;
+        add(navigationBarPanel, BorderLayout.NORTH);
 
+        // Main part of the panel
         containerPanel = new JPanel();
+        containerPanel.setLayout(new GridBagLayout());
+        containerPanel.setBackground(Color.RED);
+
+        GridBagConstraints containerPanelConstraints = new GridBagConstraints();
+        containerPanelConstraints.fill = GridBagConstraints.BOTH;
+        containerPanelConstraints.gridy = 1;
         add(containerPanel);
+        
+        // TEMP: Testing
+        switchToProductsView();
+        
     }
 
     public void switchToProductsView() {
         containerPanel.removeAll();
-        containerPanel.add(new ProductViewPanel(parentFrame));
+        GridBagConstraints constraints = new GridBagConstraints();
+        constraints.weightx = 1.0; // Cell takes up all extra horizontal space
+        constraints.weighty = 1.0; // Cell takes up all extra vertical space
+        constraints.fill = GridBagConstraints.BOTH;
+        containerPanel.add(new ProductViewPanel(parentFrame), constraints);
 
         redraw();
     }

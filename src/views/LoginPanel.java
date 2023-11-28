@@ -7,7 +7,7 @@ import java.sql.SQLException;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 
-import helpers.FormHelpers;
+import helpers.ViewHelpers;
 import models.business.Account;
 import models.database.DatabaseConnection;
 import models.database.DatabaseMethods;
@@ -27,10 +27,10 @@ class LoginPanel extends JPanel {
         // Login Panel 
         JPanel loginPanel = new JPanel();
         loginPanel.setLayout(new GridBagLayout());
-        loginPanel.setBackground(StyleConstants.SECTION_COLOUR);
+        loginPanel.setBackground(CustomStyleConstants.SECTION_COLOUR);
         loginPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
 
-        GridBagConstraints loginPanelConstraints = FormHelpers.getGridBagConstraints(0, 0);
+        GridBagConstraints loginPanelConstraints = ViewHelpers.getGridBagConstraints(0, 0);
         
         // Title Panel
         JPanel titlePanel = new JPanel(new FlowLayout());
@@ -48,39 +48,39 @@ class LoginPanel extends JPanel {
         JPanel entryPanel = new JPanel(new GridBagLayout());
         entryPanel.setOpaque(false);
 
-        GridBagConstraints entryPanelConstraints = FormHelpers.getGridBagConstraints(0, 1);
+        GridBagConstraints entryPanelConstraints = ViewHelpers.getGridBagConstraints(0, 1);
         entryPanelConstraints.insets = new Insets(10, 10, 10, 10);
         
         // Email entry
         JLabel emailLabel = new JLabel("Email");
-        GridBagConstraints emailLabelConstraints = FormHelpers.getGridBagConstraints(0, 0);
+        GridBagConstraints emailLabelConstraints = ViewHelpers.getGridBagConstraints(0, 0);
         
         entryPanel.add(emailLabel, emailLabelConstraints);
 
         emailErrorLabel = new JLabel("", SwingConstants.RIGHT);
-        GridBagConstraints emailErrorLabelConstraints = FormHelpers.getGridBagConstraints(1, 0);
+        GridBagConstraints emailErrorLabelConstraints = ViewHelpers.getGridBagConstraints(1, 0);
         emailErrorLabel.setForeground(Color.RED);
 
         entryPanel.add(emailErrorLabel, emailErrorLabelConstraints);
 
         emailTextField = new JTextField(30);
-        GridBagConstraints emailTextFieldConstraints = FormHelpers.getGridBagConstraints(0, 1);
+        GridBagConstraints emailTextFieldConstraints = ViewHelpers.getGridBagConstraints(0, 1);
         emailTextFieldConstraints.insets = new Insets(0, 0, 5, 0);
         emailTextFieldConstraints.gridwidth = 2;
         entryPanel.add(emailTextField, emailTextFieldConstraints);
 
         // Password entry
         JLabel passwordLabel = new JLabel("Password");
-        GridBagConstraints passwordLabelConstraints = FormHelpers.getGridBagConstraints(0, 2);
+        GridBagConstraints passwordLabelConstraints = ViewHelpers.getGridBagConstraints(0, 2);
         entryPanel.add(passwordLabel, passwordLabelConstraints);
 
         passwordErrorLabel = new JLabel("", SwingConstants.RIGHT);
         passwordErrorLabel.setForeground(Color.RED);
 
-        entryPanel.add(passwordErrorLabel, FormHelpers.getGridBagConstraints(1, 2));
+        entryPanel.add(passwordErrorLabel, ViewHelpers.getGridBagConstraints(1, 2));
 
         passwordTextField = new JPasswordField();
-        GridBagConstraints passwordTextFieldConstraints = FormHelpers.getGridBagConstraints(0, 3);
+        GridBagConstraints passwordTextFieldConstraints = ViewHelpers.getGridBagConstraints(0, 3);
         passwordTextFieldConstraints.insets = new Insets(0, 0, 0, 0);
         passwordTextFieldConstraints.gridwidth = 2;
         entryPanel.add(passwordTextField, passwordTextFieldConstraints);
@@ -95,7 +95,7 @@ class LoginPanel extends JPanel {
         submitPanel.add(loginButton, BorderLayout.NORTH);
 
         loginPanel.add(titlePanel);
-        loginPanel.add(submitPanel, FormHelpers.getGridBagConstraints(0, 2, false));
+        loginPanel.add(submitPanel, ViewHelpers.getGridBagConstraints(0, 2, false));
         loginPanel.add(entryPanel, entryPanelConstraints);
         
 
@@ -103,7 +103,7 @@ class LoginPanel extends JPanel {
         JPanel registerPanel = new JPanel();
         registerPanel.setOpaque(false);
         registerPanel.setLayout(new GridBagLayout());
-        GridBagConstraints registerPanelConstraints = FormHelpers.getGridBagConstraints(0, 1);
+        GridBagConstraints registerPanelConstraints = ViewHelpers.getGridBagConstraints(0, 1);
         registerPanelConstraints.insets = new Insets(10, 0, 0, 10);
 
         JLabel registerLabel = new JLabel("Don't have an account?");
@@ -129,8 +129,8 @@ class LoginPanel extends JPanel {
         String password = passwordTextField.getText();
 
         // Verify data has been provided
-        Boolean missingData = FormHelpers.setErrorIfEmpty(email, emailErrorLabel);
-        missingData |= FormHelpers.setErrorIfEmpty(password, passwordErrorLabel);
+        Boolean missingData = ViewHelpers.setErrorIfEmpty(email, emailErrorLabel);
+        missingData |= ViewHelpers.setErrorIfEmpty(password, passwordErrorLabel);
         
         if (missingData)
             return;

@@ -230,7 +230,7 @@ public final class DatabaseMethods {
         }
     }
 
-    public Product findProduct(Connection connection, int currentID) throws SQLException {
+    public static Product findProduct(Connection connection, int currentID) throws SQLException {
 
         try {
             String selectStatement = "SELECT * FROM `Product` WHERE productID = ?";
@@ -260,7 +260,7 @@ public final class DatabaseMethods {
         }
     }
 
-    public ArrayList<Product> getTrackPackParts(Connection connection, Product set) throws SQLException {
+    public static ArrayList<Product> getTrackPackParts(Connection connection, Product set) throws SQLException {
 
         try {
 
@@ -288,7 +288,7 @@ public final class DatabaseMethods {
         }
     }
 
-    public ArrayList<Product> getTrainSetParts(Connection connection, Product set) throws SQLException {
+    public static ArrayList<Product> getTrainSetParts(Connection connection, Product set) throws SQLException {
 
         try {
 
@@ -337,6 +337,139 @@ public final class DatabaseMethods {
             }
 
             return parts;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw e;
+        }
+
+
+
+
+    }
+
+    public static ArrayList<Controller> getControllers(Connection connection) throws SQLException { 
+        try {
+            ArrayList<Controller> controllers = new ArrayList<>();
+
+            String selectStatement = "SELECT * FROM Controller "
+                + "JOIN Product ON Product.productID = Controller.productID";
+
+            PreparedStatement preparedStatement = connection.prepareStatement(selectStatement);
+            ResultSet results = preparedStatement.executeQuery();
+
+            while (results.next()) {
+                
+                Controller current = new Controller( 
+                    results.getInt("productID"),
+                    results.getString("productCode"), 
+                    results.getString("manufacturer"),
+                    results.getString("name"),
+                    results.getInt("price"),
+                    results.getString("gauge"),
+                    results.getBoolean("digital")
+                    );
+
+                controllers.add(current);
+            }
+
+            return controllers;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw e;
+        }
+    }
+    public static ArrayList<Locomotive> getLocomotives(Connection connection) throws SQLException { 
+        try {
+            ArrayList<Locomotive> locomotives = new ArrayList<>();
+
+            String selectStatement = "SELECT * FROM Locomotive "
+                + "JOIN Product ON Product.productID = Locomotive.productID";
+
+            PreparedStatement preparedStatement = connection.prepareStatement(selectStatement);
+            ResultSet results = preparedStatement.executeQuery();
+
+            while (results.next()) {
+                
+                Locomotive current = new Locomotive( 
+                    results.getInt("productID"),
+                    results.getString("productCode"), 
+                    results.getString("manufacturer"),
+                    results.getString("name"),
+                    results.getInt("price"),
+                    results.getString("gauge"),
+                    results.getString("codeDCC"),
+                    results.getString("era")
+                    );
+
+                locomotives.add(current);
+            }
+
+            return locomotives;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw e;
+        }
+    }
+    public static ArrayList<RollingStock> getRollingStocks(Connection connection) throws SQLException { 
+        try {
+            ArrayList<RollingStock> rollingStock = new ArrayList<>();
+
+            String selectStatement = "SELECT * FROM `Rolling Stock` "
+                + "JOIN Product ON Product.productID = `Rolling Stock`.productID";
+
+            PreparedStatement preparedStatement = connection.prepareStatement(selectStatement);
+            ResultSet results = preparedStatement.executeQuery();
+
+            while (results.next()) {
+                RollingStock current = new RollingStock( 
+                    results.getInt("productID"),
+                    results.getString("productCode"), 
+                    results.getString("manufacturer"),
+                    results.getString("name"),
+                    results.getInt("price"),
+                    results.getString("gauge"),
+                    results.getString("era"),
+                    results.getBoolean("isCarriage")
+                    );
+
+                rollingStock.add(current);
+            }
+
+            return rollingStock;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw e;
+        }
+    }
+    public static ArrayList<Track> getTracks(Connection connection) throws SQLException { 
+        try {
+            ArrayList<Track> track = new ArrayList<>();
+
+            String selectStatement = "SELECT * FROM Track "
+                + "JOIN Product ON Product.productID = Track.productID";
+
+            PreparedStatement preparedStatement = connection.prepareStatement(selectStatement);
+            ResultSet results = preparedStatement.executeQuery();
+
+            while (results.next()) {
+                
+                Track current = new Track( 
+                    results.getInt("productID"),
+                    results.getString("productCode"), 
+                    results.getString("manufacturer"),
+                    results.getString("name"),
+                    results.getInt("price"),
+                    results.getString("gauge")
+                    );
+
+                track.add(current);
+            }
+
+            return track;
 
         } catch (SQLException e) {
             e.printStackTrace();

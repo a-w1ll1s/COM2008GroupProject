@@ -6,7 +6,7 @@ import java.awt.event.ActionEvent;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 
-import helpers.FormHelpers;
+import helpers.ViewHelpers;
 import views.DashboardPanel;
 
 class RegisterPanel extends JPanel {
@@ -28,11 +28,11 @@ class RegisterPanel extends JPanel {
         // Register Panel 
         JPanel registerPanel = new JPanel();
         registerPanel.setLayout(new GridBagLayout());
-        registerPanel.setBackground(StyleConstants.SECTION_COLOUR);
+        registerPanel.setBackground(CustomStyleConstants.SECTION_COLOUR);
         registerPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
 
         
-        GridBagConstraints registerPanelConstraints = FormHelpers.getGridBagConstraints(0, 0);
+        GridBagConstraints registerPanelConstraints = ViewHelpers.getGridBagConstraints(0, 0);
     
         
         // Title Panel
@@ -57,35 +57,35 @@ class RegisterPanel extends JPanel {
 
         // Email entry
         JLabel emailLabel = new JLabel("Email");
-        GridBagConstraints emailLabelConstraints = FormHelpers.getGridBagConstraints(0, 0);
+        GridBagConstraints emailLabelConstraints = ViewHelpers.getGridBagConstraints(0, 0);
         
         entryPanel.add(emailLabel, emailLabelConstraints);
 
         emailErrorLabel = new JLabel("", SwingConstants.RIGHT);
         emailErrorLabel.setForeground(Color.RED);
-        GridBagConstraints emailErrorLabelConstraints = FormHelpers.getGridBagConstraints(1, 0);
+        GridBagConstraints emailErrorLabelConstraints = ViewHelpers.getGridBagConstraints(1, 0);
         
         entryPanel.add(emailErrorLabel, emailErrorLabelConstraints);
     
         emailTextField = new JTextField(TEXT_FIELD_COLUMNS);
-        GridBagConstraints emailTextFieldConstraints = FormHelpers.getGridBagConstraints(0, 1);
+        GridBagConstraints emailTextFieldConstraints = ViewHelpers.getGridBagConstraints(0, 1);
         emailTextFieldConstraints.insets = new Insets(0, 0, 5, 0);
         emailTextFieldConstraints.gridwidth = 2;
         entryPanel.add(emailTextField, emailTextFieldConstraints);
 
         // Password entry
         JLabel passwordLabel = new JLabel("Password");
-        GridBagConstraints passwordLabelConstraints = FormHelpers.getGridBagConstraints(0, 2);
+        GridBagConstraints passwordLabelConstraints = ViewHelpers.getGridBagConstraints(0, 2);
         entryPanel.add(passwordLabel, passwordLabelConstraints);
 
         passwordErrorLabel = new JLabel("", SwingConstants.RIGHT);
-        GridBagConstraints passwordErrorLabelConstraints = FormHelpers.getGridBagConstraints(1, 2);
+        GridBagConstraints passwordErrorLabelConstraints = ViewHelpers.getGridBagConstraints(1, 2);
         passwordErrorLabel.setForeground(Color.RED);
 
         entryPanel.add(passwordErrorLabel, passwordErrorLabelConstraints);
 
         passwordTextField = new JPasswordField();
-        GridBagConstraints passwordTextFieldConstraints = FormHelpers.getGridBagConstraints(0, 3);
+        GridBagConstraints passwordTextFieldConstraints = ViewHelpers.getGridBagConstraints(0, 3);
         passwordTextFieldConstraints.insets = new Insets(0, 0, 5, 0);
         passwordTextFieldConstraints.gridwidth = 2;
         entryPanel.add(passwordTextField, passwordTextFieldConstraints);
@@ -97,108 +97,108 @@ class RegisterPanel extends JPanel {
 
         // Forename entry
         JLabel forenameLabel = new JLabel("Forename");
-        GridBagConstraints forenameLabelConstraints = FormHelpers.getGridBagConstraints(0, 4);
+        GridBagConstraints forenameLabelConstraints = ViewHelpers.getGridBagConstraints(0, 4);
         forenameLabelConstraints.insets = labelInsets;
         entryPanel.add(forenameLabel, forenameLabelConstraints);
 
         forenameTextField = new JTextField(TEXT_FIELD_COLUMNS / 2);
-        GridBagConstraints forenameTextFieldConstraints = FormHelpers.getGridBagConstraints(0, 5);
+        GridBagConstraints forenameTextFieldConstraints = ViewHelpers.getGridBagConstraints(0, 5);
         forenameTextFieldConstraints.insets = leftSideTextFieldInsets;
         entryPanel.add(forenameTextField, forenameTextFieldConstraints);
 
         forenameErrorLabel = new JLabel("");
         forenameErrorLabel.setForeground(Color.RED);
 
-        entryPanel.add(forenameErrorLabel, FormHelpers.getGridBagConstraints(0, 6));
+        entryPanel.add(forenameErrorLabel, ViewHelpers.getGridBagConstraints(0, 6));
     
         // Surname entry
         JLabel surnameLabel = new JLabel("Surname");
-        GridBagConstraints surnameLabelConstraints = FormHelpers.getGridBagConstraints(1, 4);
+        GridBagConstraints surnameLabelConstraints = ViewHelpers.getGridBagConstraints(1, 4);
         surnameLabelConstraints.insets = labelInsets;
         entryPanel.add(surnameLabel, surnameLabelConstraints);
 
         surnameTextField = new JTextField(TEXT_FIELD_COLUMNS / 2);
-        GridBagConstraints surnameTextFieldConstraints = FormHelpers.getGridBagConstraints(1, 5);
+        GridBagConstraints surnameTextFieldConstraints = ViewHelpers.getGridBagConstraints(1, 5);
         entryPanel.add(surnameTextField, surnameTextFieldConstraints);
 
         surnameErrorLabel = new JLabel("");
         surnameErrorLabel.setForeground(Color.RED);
 
-        entryPanel.add(surnameErrorLabel, FormHelpers.getGridBagConstraints(1, 6));
+        entryPanel.add(surnameErrorLabel, ViewHelpers.getGridBagConstraints(1, 6));
 
         // House number/name entry
         JLabel houseNumberLabel = new JLabel("House Number/Name");
-        GridBagConstraints houseNumberLabelConstraints = FormHelpers.getGridBagConstraints(0, 8);
+        GridBagConstraints houseNumberLabelConstraints = ViewHelpers.getGridBagConstraints(0, 8);
         houseNumberLabelConstraints.insets = labelInsets;
         
         entryPanel.add(houseNumberLabel, houseNumberLabelConstraints);
     
         houseNumberTextField = new JTextField(12);
-        GridBagConstraints houseNumberTextFieldConstraints = FormHelpers.getGridBagConstraints(0, 9);
+        GridBagConstraints houseNumberTextFieldConstraints = ViewHelpers.getGridBagConstraints(0, 9);
         houseNumberTextFieldConstraints.insets = leftSideTextFieldInsets;
         entryPanel.add(houseNumberTextField, houseNumberTextFieldConstraints);
 
         // Postcode entry
         JLabel postcodeLabel = new JLabel("Postcode");
-        GridBagConstraints postcodeLabelConstraints = FormHelpers.getGridBagConstraints(1, 8);
+        GridBagConstraints postcodeLabelConstraints = ViewHelpers.getGridBagConstraints(1, 8);
         postcodeLabelConstraints.insets = labelInsets;
         entryPanel.add(postcodeLabel, postcodeLabelConstraints);
     
         postcodeTextField = new JTextField(12);
-        GridBagConstraints postcodeTextFieldConstraints = FormHelpers.getGridBagConstraints(1, 9);
+        GridBagConstraints postcodeTextFieldConstraints = ViewHelpers.getGridBagConstraints(1, 9);
         entryPanel.add(postcodeTextField, postcodeTextFieldConstraints);
 
         // Housenumber/postcode error labels
         houseNumberErrorLabel = new JLabel("");
         houseNumberErrorLabel.setForeground(Color.RED);
-        GridBagConstraints houseNumberErrorLabelConstraints = FormHelpers.getGridBagConstraints(0, 10);
+        GridBagConstraints houseNumberErrorLabelConstraints = ViewHelpers.getGridBagConstraints(0, 10);
         
         entryPanel.add(houseNumberErrorLabel, houseNumberErrorLabelConstraints);
 
         postcodeErrorLabel = new JLabel("");
         postcodeErrorLabel.setForeground(Color.RED);
-        GridBagConstraints postcodeErrorLabelConstraints = FormHelpers.getGridBagConstraints(1, 10);
+        GridBagConstraints postcodeErrorLabelConstraints = ViewHelpers.getGridBagConstraints(1, 10);
         
         entryPanel.add(postcodeErrorLabel, postcodeErrorLabelConstraints);
 
         // City name entry
         JLabel cityNameLabel = new JLabel("City Name");
-        GridBagConstraints cityNameLabelConstraints = FormHelpers.getGridBagConstraints(0, 11);
+        GridBagConstraints cityNameLabelConstraints = ViewHelpers.getGridBagConstraints(0, 11);
         cityNameLabelConstraints.insets = labelInsets;
         entryPanel.add(cityNameLabel, cityNameLabelConstraints);
     
         cityNameTextField = new JTextField(12);
-        GridBagConstraints cityNameTextFieldConstraints = FormHelpers.getGridBagConstraints(0, 12);
+        GridBagConstraints cityNameTextFieldConstraints = ViewHelpers.getGridBagConstraints(0, 12);
         cityNameTextFieldConstraints.insets = leftSideTextFieldInsets;
         entryPanel.add(cityNameTextField, cityNameTextFieldConstraints);
 
         // Road name entry
         JLabel roadNameLabel = new JLabel("Road Name");
-        GridBagConstraints roadNameLabelConstraints = FormHelpers.getGridBagConstraints(1, 11);
+        GridBagConstraints roadNameLabelConstraints = ViewHelpers.getGridBagConstraints(1, 11);
         roadNameLabelConstraints.insets = labelInsets;
         entryPanel.add(roadNameLabel, roadNameLabelConstraints);
     
         roadNameTextField = new JTextField(12);
-        GridBagConstraints roadNameTextFieldConstraints = FormHelpers.getGridBagConstraints(1, 12);
+        GridBagConstraints roadNameTextFieldConstraints = ViewHelpers.getGridBagConstraints(1, 12);
         entryPanel.add(roadNameTextField, roadNameTextFieldConstraints);
 
         // City name/Road name error labels
         cityNameErrorLabel = new JLabel("");
         cityNameErrorLabel.setForeground(Color.RED);
-        GridBagConstraints cityNameErrorLabelConstraints = FormHelpers.getGridBagConstraints(0, 13);
+        GridBagConstraints cityNameErrorLabelConstraints = ViewHelpers.getGridBagConstraints(0, 13);
         
         entryPanel.add(cityNameErrorLabel, cityNameErrorLabelConstraints);
 
         roadNameErrorLabel = new JLabel("");
         roadNameErrorLabel.setForeground(Color.RED);
-        GridBagConstraints roadNameErrorLabelConstraints = FormHelpers.getGridBagConstraints(1, 13);
+        GridBagConstraints roadNameErrorLabelConstraints = ViewHelpers.getGridBagConstraints(1, 13);
         
         entryPanel.add(roadNameErrorLabel, roadNameErrorLabelConstraints);
 
         // Submit Panel
         JPanel submitPanel = new JPanel(new BorderLayout());
         submitPanel.setOpaque(false);
-        GridBagConstraints submitPanelConstraints = FormHelpers.getGridBagConstraints(0, 2, false);
+        GridBagConstraints submitPanelConstraints = ViewHelpers.getGridBagConstraints(0, 2, false);
 
         JButton registerButton = new JButton("Register");
         registerButton.addActionListener(e -> TryRegister(e));
@@ -212,7 +212,7 @@ class RegisterPanel extends JPanel {
         JPanel loginPanel = new JPanel();
         loginPanel.setOpaque(false);
         loginPanel.setLayout(new GridBagLayout());
-        GridBagConstraints loginPanelConstraints = FormHelpers.getGridBagConstraints(0, 1);
+        GridBagConstraints loginPanelConstraints = ViewHelpers.getGridBagConstraints(0, 1);
         loginPanelConstraints.insets = new Insets(10, 0, 0, 10);
 
         JLabel loginLabel = new JLabel("Already have an account?");
@@ -251,14 +251,14 @@ class RegisterPanel extends JPanel {
         String roadName = roadNameTextField.getText();
         
         // Verify all data has been provided
-        Boolean missingData = FormHelpers.setErrorIfEmpty(email, emailErrorLabel);
-        missingData |= FormHelpers.setErrorIfEmpty(password, passwordErrorLabel);
-        missingData |= FormHelpers.setErrorIfEmpty(forename, forenameErrorLabel);
-        missingData |= FormHelpers.setErrorIfEmpty(surname, surnameErrorLabel);
-        missingData |= FormHelpers.setErrorIfEmpty(houseNumber, houseNumberErrorLabel);
-        missingData |= FormHelpers.setErrorIfEmpty(postcode, postcodeErrorLabel);
-        missingData |= FormHelpers.setErrorIfEmpty(roadName, roadNameErrorLabel);
-        missingData |= FormHelpers.setErrorIfEmpty(cityName, cityNameErrorLabel);
+        Boolean missingData = ViewHelpers.setErrorIfEmpty(email, emailErrorLabel);
+        missingData |= ViewHelpers.setErrorIfEmpty(password, passwordErrorLabel);
+        missingData |= ViewHelpers.setErrorIfEmpty(forename, forenameErrorLabel);
+        missingData |= ViewHelpers.setErrorIfEmpty(surname, surnameErrorLabel);
+        missingData |= ViewHelpers.setErrorIfEmpty(houseNumber, houseNumberErrorLabel);
+        missingData |= ViewHelpers.setErrorIfEmpty(postcode, postcodeErrorLabel);
+        missingData |= ViewHelpers.setErrorIfEmpty(roadName, roadNameErrorLabel);
+        missingData |= ViewHelpers.setErrorIfEmpty(cityName, cityNameErrorLabel);
 
         if (missingData)
             return;
