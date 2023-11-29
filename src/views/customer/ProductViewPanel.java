@@ -49,8 +49,7 @@ public class ProductViewPanel extends JPanel {
         }
 
         GridBagConstraints buttonsPanelConstraints = new GridBagConstraints();
-        buttonsPanelConstraints.fill = GridBagConstraints.BOTH;
-        buttonsPanelConstraints.weightx = 0.15;
+        buttonsPanelConstraints.fill = GridBagConstraints.VERTICAL;
         buttonsPanelConstraints.weighty = 1;
         
         mainPanel.add(categoryButtonsPanel, buttonsPanelConstraints);
@@ -116,7 +115,7 @@ public class ProductViewPanel extends JPanel {
 
         JButton confirmOrderButton = new JButton("Confirm order");
         confirmOrderButton.addActionListener(e -> {
-                        
+
         });
 
         JButton addToOrderButton = new JButton("Add to order");
