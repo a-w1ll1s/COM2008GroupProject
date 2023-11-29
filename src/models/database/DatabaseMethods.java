@@ -952,13 +952,47 @@ public final class DatabaseMethods {
             connection.setAutoCommit(true);
         }
     }
-    
-    //public static Order startNewOrder(Connection connection, int accountID) {
-    //
-    //}
 
-    //public static int getQuantityOfProductInOrder(Connection connection, int userID, int productID) {
+    public void addOrder(Connection connection, Order order) throws SQLException{
 
-    //}
+        try {
+
+            String insertStatement = "INSERT INTO Order (orderID, userID, date, status) VALUES (?, ?, ?, ?)";
+            PreparedStatement preparedStatement = connection.prepareStatement(insertStatement);
+
+            preparedStatement.setInt(1, order.getOrderID());
+            preparedStatement.setInt(2, order.getUserID());
+            preparedStatement.setInt(1, order.getDate());
+            preparedStatement.setString(1, order.getStatus());
+
+            preparedStatement.executeUpdate();
+           
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw e;
+        }
+
+    }
+
+    public void addOrderLine(Connection connection, int orderID, OrderLine orderLine) throws SQLException{
+
+        try {
+
+            String insertStatement = "INSERT INTO `Order Line` (orderID, lineID, productID, quantity) VALUES (?, ?, ?, ?)";
+            PreparedStatement preparedStatement = connection.prepareStatement(insertStatement);
+
+            preparedStatement.setInt(1, orderID);
+            preparedStatement.setInt(2, orderLine.getLineNum());
+            preparedStatement.setInt(1, orderLine.getProduct().getProductID());
+            preparedStatement.setInt(1, orderLine.getQuantity());
+
+            preparedStatement.executeUpdate();
+           
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw e;
+        }
+
+    }
 
 }
