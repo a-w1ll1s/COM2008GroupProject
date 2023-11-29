@@ -29,9 +29,15 @@ class NavigationBarPanel extends JPanel {
         JButton accountSettingsButton = new JButton("Account Settings");
         
 
+        // Staff button
+        if (account.isStaff()){
+            JButton staffButton = new JButton("Staff");
+            staffButton.addActionListener(e -> {
+                parentPanel.switchToStaffView();
+            });
 
-
-        
+            add(staffButton);
+        }
 
         add(browserProductsButton);
         add(orderHistorySettingsButton);    

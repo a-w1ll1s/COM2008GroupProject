@@ -31,10 +31,11 @@ public class MainFrame extends JFrame {
         
         contentPane = getContentPane();
         contentPane.setLayout(new BorderLayout());
-        //showPage(new LoginPanel(this));
+        showPage(new LoginPanel(this));
 
 
         // TEMP: Testing dashboard
+        /* 
         DatabaseConnection databaseConnection = new DatabaseConnection();
         Account account = null;
         try {
@@ -50,6 +51,7 @@ public class MainFrame extends JFrame {
         }
 
         showPage(new DashboardPanel(this, account));
+        */
     }
 
     public void showPage(JPanel panel) {

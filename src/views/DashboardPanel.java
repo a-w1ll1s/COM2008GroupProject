@@ -51,6 +51,11 @@ class DashboardPanel extends JPanel {
         redraw();
     }
 
+    public void switchToStaffView() {
+        // TEMP: For now just go to customer view, need to show the staff options on the items
+        switchToProductsView();
+    }
+
     private void redraw() {        
         containerPanel.revalidate();
         containerPanel.repaint();

@@ -7,23 +7,18 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.swing.*;
-import javax.swing.border.Border;
-import javax.swing.border.EmptyBorder;
-import javax.swing.text.StyleConstants;
 
 import models.business.Controller;
 import models.business.Locomotive;
 import models.business.Product;
 import models.business.RollingStock;
 import models.business.Track;
-import models.business.TrackPack;
-import views.CustomStyleConstants;
 
 class ProductPanel extends JPanel {
     private Font boldFont = new Font("", Font.BOLD, 14);
 
     private void setup(Product product) {
-        setLayout(new GridLayout(0, 2));
+        setLayout(new GridLayout(0, 2)); // TODO: Change to 3 and add buttons to the right?
         setBorder(BorderFactory.createLoweredSoftBevelBorder());
 
         // Standard labels for the product parts
@@ -50,7 +45,6 @@ class ProductPanel extends JPanel {
         JLabel typeLabel = new JLabel("Type: " + signalType);
 
         add(typeLabel);
-        
     }
     public ProductPanel(Locomotive locomotive) {        
         setup(locomotive);
@@ -116,7 +110,6 @@ class ProductPanel extends JPanel {
         add(new JLabel());
 
         for (Product product : uniqueProducts) {
-            System.out.println(product.getProductID() + " " + product.getName());
             int count = itemCountMap.get(product.getProductID());
             JLabel nameLabel = new JLabel(product.getName() + String.format(" x%d", count));
             add(nameLabel);

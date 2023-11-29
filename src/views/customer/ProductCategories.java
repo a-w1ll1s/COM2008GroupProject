@@ -9,11 +9,11 @@ public interface ProductCategories {
     public static final String CONTROLLERS = "Controllers";
 
     public static final String[] categories = {
-        TRAIN_SETS,
-        TRACK_PACKS,
-        TRACK,
-        ROLLING_STOCK,
         LOCOMOTIVES,
-        CONTROLLERS
+        TRACK,
+        ROLLING_STOCK,        
+        CONTROLLERS,
+        TRAIN_SETS,
+        TRACK_PACKS
     };
 }

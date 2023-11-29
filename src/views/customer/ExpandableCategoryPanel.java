@@ -23,9 +23,12 @@ import views.Manager.StaffTableModel;
 class ExpandableCategoryPanel extends JPanel {
     private Account account;
     private JPanel productContainerPanel;
+    private String category;
 
     public ExpandableCategoryPanel(Account account, String category) {       
         this.account = account;
+        this.category = category;
+
         setLayout(new GridBagLayout());
 
         productContainerPanel = new JPanel();
@@ -112,5 +115,9 @@ class ExpandableCategoryPanel extends JPanel {
         
         JScrollPane scrollPane = new JScrollPane(productContainerPanel);
         add(scrollPane, productContainerConstraints);
+    }
+
+    public String getCategory() {
+        return category;
     }
 }

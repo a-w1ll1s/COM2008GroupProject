@@ -4,6 +4,7 @@ import java.awt.*;
 
 import javax.swing.*;
 
+import views.CustomStyleConstants;
 import views.MainFrame;
 
 public class ProductViewPanel extends JPanel {
@@ -44,10 +45,14 @@ public class ProductViewPanel extends JPanel {
         
 
         // Selected category products panel
-        selectCategory("Train Sets");
+        selectCategory(ProductCategories.categories[0]);
     }
 
     private void selectCategory(String category) {
+        // Check we're not already on the category
+        if (selectedCategory != null && category.equals(selectedCategory.getCategory())) 
+            return;
+
         // Remove throws error if the category wasn't actually selected.
         try {
             remove(selectedCategory);
