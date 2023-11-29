@@ -367,7 +367,7 @@ public final class DatabaseMethods {
             products.add(trainSetProduct);
 
             // Get each product in the track pack
-            products.addAll(DatabaseMethods.getTrainSetParts(connection, trainSetProduct));
+            products.addAll(DatabaseMethods.getTrainSetPartsAsPacks(connection, trainSetProduct));
 
             trainSets.add(products);
         }
@@ -375,8 +375,8 @@ public final class DatabaseMethods {
         return trainSets;
     }
 
-    public static ArrayList<Product> getTrainSetParts(Connection connection, Product set) throws SQLException {
-
+    public static ArrayList<Product> getTrainSetPartsAsPacks(Connection connection, Product set) throws SQLException {
+        // Returns all the train set parts, with products like track packs NOT expanded
         try {
 
             ArrayList<Product> parts = new ArrayList<>();
@@ -418,7 +418,73 @@ public final class DatabaseMethods {
                 while(trackPackResults.next()) {
                     Product trackPack = getProductFromResult(trackPackResults);
 
-                    // TODO: Change to just return the track pack?
+                    parts.add(trackPack);
+                    
+                }
+
+                String controllerStatement = "SELECT * FROM `Train Sets` "
+                    + "JOIN Product ON Product.productID = `Train Sets`.productID "
+                    + "WHERE `Train Sets`.productID = ?";
+                PreparedStatement controllerPrepared = connection.prepareStatement(controllerStatement);
+                controllerPrepared.setInt(1, setID);
+                ResultSet controllerResults = controllerPrepared.executeQuery();
+
+                while(controllerResults.next()) {
+                    parts.add(getProductFromResult(controllerResults));
+                }
+            }
+
+            return parts;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw e;
+        }
+    }
+
+    public static ArrayList<Product> getTrainSetParts(Connection connection, Product set) throws SQLException {
+        // Returns all the train set parts, with products like track packs expanded.
+        try {
+
+            ArrayList<Product> parts = new ArrayList<>();
+
+            int setID = set.getProductID();
+            String setCode = set.getProductCode();
+
+            if (setCode.equals("M")) {
+                String rollingStockStatement = "SELECT * FROM `HasRollingStock` "
+                    + "JOIN Product ON Product.productID = `HasRollingStock`.partID "
+                    + "WHERE setID = ?";
+
+                PreparedStatement rollingStockPrepared = connection.prepareStatement(rollingStockStatement);
+                rollingStockPrepared.setInt(1, setID);
+                ResultSet rollingStockResults = rollingStockPrepared.executeQuery();
+
+                while(rollingStockResults.next()) {                    
+                    parts.add(getProductFromResult(rollingStockResults));
+                }
+
+                String locomotiveStatement = "SELECT * FROM `HasLocomotive` "
+                    + "JOIN Product ON Product.productID = `HasLocomotive`.partID "
+                    + "WHERE setID = ?";
+                PreparedStatement locomotivePrepared = connection.prepareStatement(locomotiveStatement);
+                locomotivePrepared.setInt(1, setID);
+                ResultSet locomotiveResults = locomotivePrepared.executeQuery();
+
+                while(locomotiveResults.next()) {
+                    parts.add(getProductFromResult(locomotiveResults));
+                }
+
+                String trackPackStatement = "SELECT * FROM `HasTrackPack` "
+                    + "JOIN Product ON Product.productID = `HasTrackPack`.partID "
+                    + "WHERE setID = ?";
+                PreparedStatement trackPackPrepared = connection.prepareStatement(trackPackStatement);
+                trackPackPrepared.setInt(1, setID);
+                ResultSet trackPackResults = trackPackPrepared.executeQuery();
+
+                while(trackPackResults.next()) {
+                    Product trackPack = getProductFromResult(trackPackResults);
+
                     parts.addAll(getTrackPackParts(connection, trackPack));
                     
                 }
