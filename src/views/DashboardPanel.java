@@ -6,9 +6,10 @@ import javax.swing.*;
 
 import models.business.Account;
 import views.Manager.ManagerView;
-import views.Staff.PendingOrderQueueView;
 import views.Staff.StaffView;
 import views.customer.ProductViewPanel;
+
+import views.customer.OrderHistoryPanel;
 
 // Parent panel for the dashboard for customers, staff and managers
 class DashboardPanel extends JPanel {
@@ -54,9 +55,18 @@ class DashboardPanel extends JPanel {
     }
 
     public void switchToProductsView() {
-        switchToPanelView(new ProductViewPanel(parentFrame));
-        
+        switchToPanelView(new ProductViewPanel(parentFrame, false));
     }
+
+    public void switchToOrderHistoryView() {
+        switchToPanelView(new OrderHistoryPanel(parentFrame, account));
+    }
+
+    public void switchToAccountSettingsView() {
+        // TODO: Implement account settings panel
+        switchToPanelView(new JPanel());
+    }
+
 
     public void switchToStaffView() {
         switchToPanelView(new StaffView(parentFrame));

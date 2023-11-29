@@ -707,7 +707,7 @@ public final class DatabaseMethods {
         return pendingOrders;
     }
 
-    private static ArrayList<OrderLine> getOrderLinesForOrder(Connection connection, int orderID) throws SQLException {
+    public static ArrayList<OrderLine> getOrderLinesForOrder(Connection connection, int orderID) throws SQLException {
         ArrayList<OrderLine> orderLines = new ArrayList<>();
         String lineQuery = "SELECT * FROM `Order Line` WHERE orderID = ?";
         try (PreparedStatement lineStatement = connection.prepareStatement(lineQuery)) {
@@ -784,6 +784,31 @@ public final class DatabaseMethods {
             e.printStackTrace();
             throw e;
         }
+    }
+
+    public static BankDetails getBankDetails(Connection connection, int userID) throws SQLException {
+        String selectStatement = "SELECT * FROM BankDetails WHERE userID = ?";
+        
+        try (PreparedStatement preparedStatement = connection.prepareStatement(selectStatement)) {
+            preparedStatement.setInt(1, userID);
+            ResultSet results = preparedStatement.executeQuery();
+
+            while (results.next()) {
+                String cardBrand = results.getString("cardBrand");
+                int cardNum = results.getInt("cardNum");
+                int cardExpiry = results.getInt("cardExpiry"); 
+                int securityCode = results.getInt("securityCode"); 
+                
+                BankDetails bankDetails = new BankDetails(cardBrand, cardNum, cardExpiry, securityCode);
+                
+                return bankDetails;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw e;
+        }
+        
+        return null;
     }
 
     public static void addProductToInventory(Connection connection, int productID, int stockLevel) throws SQLException {

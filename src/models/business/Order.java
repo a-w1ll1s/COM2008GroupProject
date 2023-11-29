@@ -77,4 +77,8 @@ public class Order {
     public void setOrderLines(ArrayList<OrderLine> orderLines) {
         this.orderLines = orderLines;
     }
+
+    public ArrayList<OrderLine> getOrderLines() {
+        return orderLines;
+    }
 }

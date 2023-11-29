@@ -45,9 +45,18 @@ class NavigationBarPanel extends JPanel {
         navigationButtons.add(browserProductsButton);
         
         JButton orderHistorySettingsButton = new JButton("Order History");
+        orderHistorySettingsButton.addActionListener(e -> {
+            parentPanel.switchToOrderHistoryView();
+            showSelectedButton(orderHistorySettingsButton);
+        });
+
         navigationButtons.add(orderHistorySettingsButton);
 
         JButton accountSettingsButton = new JButton("Account Settings");
+        accountSettingsButton.addActionListener(e -> {
+            parentPanel.switchToAccountSettingsView();
+            showSelectedButton(accountSettingsButton);
+        });
         navigationButtons.add(accountSettingsButton);
         
         // Manager button
