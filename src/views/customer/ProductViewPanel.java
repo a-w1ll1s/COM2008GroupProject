@@ -115,6 +115,9 @@ public class ProductViewPanel extends JPanel {
         optionButtonConstraints.insets = new Insets(5, 5, 5, 5);
 
         JButton confirmOrderButton = new JButton("Confirm order");
+        confirmOrderButton.addActionListener(e -> {
+                        
+        });
 
         JButton addToOrderButton = new JButton("Add to order");
         addToOrderButton.addActionListener(e -> {
