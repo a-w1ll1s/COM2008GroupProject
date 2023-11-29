@@ -8,29 +8,33 @@ import models.business.Customer;
 import models.business.Staff;
 import models.database.DatabaseConnection;
 import models.database.DatabaseMethods;
+import views.MainFrame;
+
 import javax.swing.*;
 import java.awt.*;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
-public class ManagerView {
-
-    private JFrame frame;
+public class ManagerView extends JPanel {
+    private MainFrame parentFrame;
     private JTable customerTable, staffTable;
     private JButton deleteButton, promoteButton;
     private ArrayList<Customer> customers;
     private ArrayList<Staff> staffs;
 
-    public ManagerView(ArrayList<Customer> customers, ArrayList<Staff> staffs) {
-        this.customers = customers;
-        this.staffs = staffs;
+    public ManagerView(MainFrame parentFrame) {
+        this.parentFrame = parentFrame;
+
+        
         initializeComponents();
+        refreshCustomerTable();
+        refreshStaffTable();
         layoutComponents();
         attachEventHandlers();
+        
     }
 
     private void initializeComponents() {
-        frame = new JFrame("Manager Panel");
         customerTable = new JTable(new CustomerTableModel(customers));
         staffTable = new JTable(new StaffTableModel(staffs));
         
@@ -39,21 +43,17 @@ public class ManagerView {
     }
 
     private void layoutComponents() {
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setLayout(new BorderLayout());
-        frame.setSize(800, 600);
+        setLayout(new BorderLayout());
 
         JTabbedPane tabbedPane = new JTabbedPane();
         tabbedPane.add("Customers", new JScrollPane(customerTable));
         tabbedPane.add("Staff", new JScrollPane(staffTable));
-        frame.add(tabbedPane, BorderLayout.CENTER);
+        add(tabbedPane, BorderLayout.CENTER);
 
         JPanel buttonPanel = new JPanel();
         buttonPanel.add(promoteButton);
         buttonPanel.add(deleteButton);
-        frame.add(buttonPanel, BorderLayout.SOUTH);
-
-        frame.setVisible(true);
+        add(buttonPanel, BorderLayout.SOUTH);
     }
 
     private void attachEventHandlers() {
@@ -68,12 +68,12 @@ public class ManagerView {
                     refreshCustomerTable();
                     refreshStaffTable();
                 } catch (SQLException ex) {
-                    JOptionPane.showMessageDialog(frame, "Error promoting customer: " + ex.getMessage());
+                    JOptionPane.showMessageDialog(parentFrame, "Error promoting customer: " + ex.getMessage());
                 } finally {
                     databaseConnection.closeConnection();
                 }
             } else {
-                JOptionPane.showMessageDialog(frame, "Please select a customer to promote.");
+                JOptionPane.showMessageDialog(parentFrame, "Please select a customer to promote.");
             }
         });
     
@@ -87,18 +87,15 @@ public class ManagerView {
                     DatabaseMethods.demoteStaffToCustomer(databaseConnection.getConnection(), staff.getUserID());
                     refreshStaffTable();
                 } catch (SQLException ex) {
-                    JOptionPane.showMessageDialog(frame, "Error demoting staff: " + ex.getMessage());
+                    JOptionPane.showMessageDialog(parentFrame, "Error demoting staff: " + ex.getMessage());
                 } finally {
                     databaseConnection.closeConnection();
                 }
             } else {
-                JOptionPane.showMessageDialog(frame, "Please select a staff member to demote.");
+                JOptionPane.showMessageDialog(parentFrame, "Please select a staff member to demote.");
             }
         });
     }
-    
-
-
     
     private void refreshCustomerTable() {
         DatabaseConnection databaseConnection = new DatabaseConnection();
@@ -108,7 +105,7 @@ public class ManagerView {
             customerTable.setModel(new CustomerTableModel(updatedCustomers));
             this.customers = updatedCustomers; // Update the local customers list
         } catch (SQLException ex) {
-            JOptionPane.showMessageDialog(frame, "Error fetching customer data: " + ex.getMessage());
+            JOptionPane.showMessageDialog(parentFrame, "Error fetching customer data: " + ex.getMessage());
         } finally {
             databaseConnection.closeConnection();
         }
@@ -122,17 +119,15 @@ public class ManagerView {
             staffTable.setModel(new StaffTableModel(updatedStaffs));
             this.staffs = updatedStaffs; // Update the local staffs list
         } catch (SQLException ex) {
-            JOptionPane.showMessageDialog(frame, "Error fetching staff data: " + ex.getMessage());
+            JOptionPane.showMessageDialog(parentFrame, "Error fetching staff data: " + ex.getMessage());
         } finally {
             databaseConnection.closeConnection();
         }
     }
     
-   
-    
     // Main method for testing
-    public static void main(String[] args) {
+    //public static void main(String[] args) {
         // For testing, you can create a new ManagerView with empty lists
-        SwingUtilities.invokeLater(() -> new ManagerView(new ArrayList<>(), new ArrayList<>()));
-    }
+        //SwingUtilities.invokeLater(() -> new ManagerView(new ArrayList<>(), new ArrayList<>()));
+    //}
 }

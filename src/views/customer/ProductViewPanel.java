@@ -1,20 +1,29 @@
 package views.customer;
 
 import java.awt.*;
+import java.util.ArrayList;
 
 import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 import views.CustomStyleConstants;
 import views.MainFrame;
 
 public class ProductViewPanel extends JPanel {
     private MainFrame parentFrame;
+    private JPanel mainPanel;
     private ExpandableCategoryPanel selectedCategory;
+    private ArrayList<JButton> categoryButtons = new ArrayList<>();
+    private JSpinner quantitySpinner;
 
-    public ProductViewPanel(MainFrame frame) {        
+    public ProductViewPanel(MainFrame frame, Account account) {        
         parentFrame = frame;
         setLayout(new GridBagLayout());
-        
+
+        mainPanel = new JPanel();
+        mainPanel.setLayout(new GridBagLayout());
+
         // Category Buttons Panel
         JPanel categoryButtonsPanel = new JPanel();
         categoryButtonsPanel.setLayout(new GridBagLayout());
@@ -30,9 +39,11 @@ public class ProductViewPanel extends JPanel {
             button.addActionListener(e -> {
                 JButton b = (JButton)e.getSource();
                 selectCategory(b.getText());
+                showSelectedButton(b);
             });
 
             buttonConstraints.gridy = i;
+            categoryButtons.add(button);
             categoryButtonsPanel.add(button, buttonConstraints);
         }
 
@@ -41,12 +52,79 @@ public class ProductViewPanel extends JPanel {
         buttonsPanelConstraints.weightx = 0.15;
         buttonsPanelConstraints.weighty = 1;
         
-        add(categoryButtonsPanel, buttonsPanelConstraints);
-        
+        mainPanel.add(categoryButtonsPanel, buttonsPanelConstraints);
+
+        GridBagConstraints mainPanelConstraints = new GridBagConstraints();
+        mainPanelConstraints.fill = GridBagConstraints.BOTH;
+        mainPanelConstraints.weightx = 1;
+        mainPanelConstraints.weighty = 1;
+
+        JPanel optionsPanel = new JPanel();
+        optionsPanel.setLayout(new GridBagLayout());
+        GridBagConstraints optionsPanelConstraints = new GridBagConstraints();
+        optionsPanelConstraints.fill = GridBagConstraints.BOTH;
+        optionsPanelConstraints.weightx = 1;
+        optionsPanelConstraints.gridy = 1;
+
+        GridBagConstraints optionButtonConstraints = new GridBagConstraints();
+        optionButtonConstraints.insets = new Insets(5, 5, 5, 5);
+
+        JButton addToOrderButton = new JButton("Add to order");
+        addToOrderButton.addActionListener(e -> {
+            if (selectedCategory.getSelectedProductID() == -1) {
+                JOptionPane.showMessageDialog(parentFrame, "Please select a product!");
+                return;
+            }
+            
+
+            System.out.println(selectedCategory.getSelectedProductID());            
+        });
+
+        JButton removeFromOrderButton = new JButton("Remove from order");
+
+        JLabel quantityLabel = new JLabel("Order Quantity: ");
+        quantitySpinner = new JSpinner(new SpinnerNumberModel(0, 0, 100, 1));
+
+        quantitySpinner.addChangeListener(new ChangeListener() {
+
+            @Override
+            public void stateChanged(ChangeEvent e) {
+                JSpinner s = (JSpinner) e.getSource();
+                System.out.println(s.getValue().toString());
+            }
+        });
+
+        optionsPanel.add(addToOrderButton, optionButtonConstraints);
+        optionsPanel.add(removeFromOrderButton, optionButtonConstraints);
+        optionsPanel.add(quantityLabel, optionButtonConstraints);
+        optionsPanel.add(quantitySpinner);
+
+        add(mainPanel, mainPanelConstraints);
+        add(optionsPanel, optionsPanelConstraints);
 
         // Selected category products panel
+        showSelectedButton(categoryButtons.get(0));
         selectCategory(ProductCategories.categories[0]);
     }
+
+    private void showSelectedButton(JButton button) {
+        // Function to reset all category button colours and select the given one
+        Color defaultColour = new JButton().getBackground();
+        for (JButton b : categoryButtons) {
+            if (b.getText().equals(button.getText())) {
+                b.setBackground(CustomStyleConstants.TOGGLED_NAV_BUTTON_COLOUR);
+            }
+            else {
+                b.setBackground(defaultColour);
+            }
+        }
+    }
+
+    public void onSelectedProductChanged() {
+        // TODO: Set the quantity to the current quantity of the product in the order
+        //quantitySpinner.setValue();
+    }
+
 
     private void selectCategory(String category) {
         // Check we're not already on the category
@@ -55,13 +133,11 @@ public class ProductViewPanel extends JPanel {
 
         // Remove throws error if the category wasn't actually selected.
         try {
-            remove(selectedCategory);
+            mainPanel.remove(selectedCategory);
         }
-        catch (Exception e) {
-            
-        }
+        catch (Exception e) {}
 
-        selectedCategory = new ExpandableCategoryPanel(null, category);
+        selectedCategory = new ExpandableCategoryPanel(this, null, category);
         selectedCategory.setBackground(Color.YELLOW);
 
         GridBagConstraints expandableCategoryPanelConstraints = new GridBagConstraints();
@@ -69,7 +145,7 @@ public class ProductViewPanel extends JPanel {
         expandableCategoryPanelConstraints.weightx = 1;
         expandableCategoryPanelConstraints.weighty = 1;
 
-        add(selectedCategory, expandableCategoryPanelConstraints);
+        mainPanel.add(selectedCategory, expandableCategoryPanelConstraints);
 
 
         revalidate();

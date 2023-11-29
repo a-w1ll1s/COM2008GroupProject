@@ -10,8 +10,8 @@ import javax.swing.SwingUtilities;
 public class Main {
     public static void main(String[] args) {
         DatabaseConnection databaseConnection = new DatabaseConnection();
-        DatabaseMethods databaseMethods = new DatabaseMethods();
 
+        /* 
         ArrayList<Customer> customers = new ArrayList<>();
         ArrayList<Staff> staffs = new ArrayList<>();
         ArrayList<Order> pendingOrders = new ArrayList<>();
@@ -20,9 +20,9 @@ public class Main {
             databaseConnection.openConnection();
 
             // Fetch data from the database
-            customers.addAll(databaseMethods.getCustomerDetails(databaseConnection.getConnection()));
-            staffs.addAll(databaseMethods.getStaffDetails(databaseConnection.getConnection()));
-            pendingOrders.addAll(databaseMethods.getPendingOrders(databaseConnection.getConnection()));
+            customers.addAll(DatabaseMethods.getCustomerDetails(databaseConnection.getConnection()));
+            staffs.addAll(DatabaseMethods.getStaffDetails(databaseConnection.getConnection()));
+            
             System.out.println("Fetched orders: " + pendingOrders);
             
         } catch (SQLException e) {
@@ -30,22 +30,8 @@ public class Main {
         } finally {
             databaseConnection.closeConnection();
         }
-
-        
-        // Display the ManagerView with customer and staff data
-        //SwingUtilities.invokeLater(() -> new ManagerView(customers, staffs));
+        */
 
         SwingUtilities.invokeLater(() -> new MainFrame("Application"));
-
-
-        // Display both ManagerView and PendingOrderQueueView
-        /* 
-        SwingUtilities.invokeLater(() -> {
-            new ManagerView(customers, staffs);
-            new PendingOrderQueueView(pendingOrders);
-        });
-        */
-        
-
     }
 }

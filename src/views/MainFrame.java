@@ -1,16 +1,7 @@
 package views;
 
 import java.awt.*;
-import java.sql.SQLException;
-import java.util.ArrayList;
-
 import javax.swing.*;
-
-import models.business.Account;
-import models.business.Customer;
-import models.business.Staff;
-import models.database.DatabaseConnection;
-import models.database.DatabaseMethods;
 
 public class MainFrame extends JFrame {
     // Needed for serialisation
@@ -32,26 +23,6 @@ public class MainFrame extends JFrame {
         contentPane = getContentPane();
         contentPane.setLayout(new BorderLayout());
         showPage(new LoginPanel(this));
-
-
-        // TEMP: Testing dashboard
-        /* 
-        DatabaseConnection databaseConnection = new DatabaseConnection();
-        Account account = null;
-        try {
-            databaseConnection.openConnection();
-            account = DatabaseMethods.getAccountDetails(databaseConnection.getConnection(), "testcustomer@test.com");
-        } 
-        catch (SQLException ex) {
-            JOptionPane.showMessageDialog(this, "Error getting account details: " + ex.getMessage());
-            return;
-        } 
-        finally {
-            databaseConnection.closeConnection();
-        }
-
-        showPage(new DashboardPanel(this, account));
-        */
     }
 
     public void showPage(JPanel panel) {

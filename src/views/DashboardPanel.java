@@ -5,7 +5,9 @@ import java.awt.*;
 import javax.swing.*;
 
 import models.business.Account;
-
+import views.Manager.ManagerView;
+import views.Staff.PendingOrderQueueView;
+import views.Staff.StaffView;
 import views.customer.ProductViewPanel;
 
 // Parent panel for the dashboard for customers, staff and managers
@@ -40,20 +42,28 @@ class DashboardPanel extends JPanel {
         
     }
 
-    public void switchToProductsView() {
+    private void switchToPanelView(JPanel panel) { 
         containerPanel.removeAll();
         GridBagConstraints constraints = new GridBagConstraints();
         constraints.weightx = 1.0; // Cell takes up all extra horizontal space
         constraints.weighty = 1.0; // Cell takes up all extra vertical space
         constraints.fill = GridBagConstraints.BOTH;
-        containerPanel.add(new ProductViewPanel(parentFrame), constraints);
+        containerPanel.add(panel, constraints);
 
         redraw();
     }
 
+    public void switchToProductsView() {
+        switchToPanelView(new ProductViewPanel(parentFrame));
+        
+    }
+
     public void switchToStaffView() {
-        // TEMP: For now just go to customer view, need to show the staff options on the items
-        switchToProductsView();
+        switchToPanelView(new StaffView(parentFrame));
+    }
+
+    public void switchToManagerView() {
+        switchToPanelView(new ManagerView(parentFrame));
     }
 
     private void redraw() {        

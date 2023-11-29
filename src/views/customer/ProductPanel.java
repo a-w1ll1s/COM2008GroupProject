@@ -1,6 +1,8 @@
 package views.customer;
 
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -13,13 +15,32 @@ import models.business.Locomotive;
 import models.business.Product;
 import models.business.RollingStock;
 import models.business.Track;
+import views.CustomStyleConstants;
 
 class ProductPanel extends JPanel {
+    private int productID;
+    private Boolean isInBasket;
+    private int orderQuantity;
     private Font boldFont = new Font("", Font.BOLD, 14);
+    private ExpandableCategoryPanel parentPanel;
 
-    private void setup(Product product) {
+    public int getProductID() {
+        return productID;
+    }
+
+    private void setup(ExpandableCategoryPanel parentPanel, Product product) {
+        this.parentPanel = parentPanel; 
+        productID = product.getProductID();
+
         setLayout(new GridLayout(0, 2)); // TODO: Change to 3 and add buttons to the right?
         setBorder(BorderFactory.createLoweredSoftBevelBorder());
+
+        addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                parentPanel.showSelectedProduct(productID);
+            }
+        });
 
         // Standard labels for the product parts
         JLabel nameLabel = new JLabel(product.getName());
@@ -37,8 +58,8 @@ class ProductPanel extends JPanel {
     }
 
     
-    public ProductPanel(Controller controller) {
-        setup(controller);
+    public ProductPanel(ExpandableCategoryPanel parentPanel, Controller controller) {
+        setup(parentPanel, controller);
         add(new JLabel());
 
         String signalType = controller.isDigital() ? "Digital" : "Analogue";
@@ -46,8 +67,8 @@ class ProductPanel extends JPanel {
 
         add(typeLabel);
     }
-    public ProductPanel(Locomotive locomotive) {        
-        setup(locomotive);
+    public ProductPanel(ExpandableCategoryPanel parentPanel, Locomotive locomotive) {        
+        setup(parentPanel, locomotive);
         add(new JLabel());
 
         JLabel gaugeLabel = new JLabel("Code DCC: " + locomotive.getCodeDCC());
@@ -58,8 +79,8 @@ class ProductPanel extends JPanel {
         add(eraLabel);
         
     }
-    public ProductPanel(RollingStock rollingStock) {        
-        setup(rollingStock);
+    public ProductPanel(ExpandableCategoryPanel parentPanel, RollingStock rollingStock) {        
+        setup(parentPanel, rollingStock);
         add(new JLabel());
 
         String rollingStockType = rollingStock.isCarriage() ? "Carriage" : "Wagon";
@@ -71,16 +92,16 @@ class ProductPanel extends JPanel {
         JLabel eraLabel = new JLabel("Era: " + rollingStock.getEra());
         add(eraLabel);
     }
-    public ProductPanel(Track track) {        
-        setup(track);
+    public ProductPanel(ExpandableCategoryPanel parentPanel, Track track) {        
+        setup(parentPanel, track);
     }
-    public ProductPanel(Product product) {
-        setup(product);
+    public ProductPanel(ExpandableCategoryPanel parentPanel, Product product) {
+        setup(parentPanel, product);
     }
 
-    public ProductPanel(ArrayList<Product> pack) {
+    public ProductPanel(ExpandableCategoryPanel parentPanel, ArrayList<Product> pack) {
         // From a pack type product where the pack product is the first in the list
-        setup(pack.get(0));
+        setup(parentPanel, pack.get(0));
 
         // Add a seperation line
         add(new JLabel());

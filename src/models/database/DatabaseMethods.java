@@ -642,7 +642,7 @@ public final class DatabaseMethods {
         }
     }
 
-    public void fulfillOrder(Connection connection, int orderId) throws SQLException {
+    public static void fulfillOrder(Connection connection, int orderId) throws SQLException {
         String updateQuery = "UPDATE `Order` SET status = 'Fulfilled' WHERE orderID = ?";
         try (PreparedStatement statement = connection.prepareStatement(updateQuery)) {
             statement.setInt(1, orderId);
@@ -650,7 +650,7 @@ public final class DatabaseMethods {
         }
     }
 
-    public void deleteOrderLinesForOrder(Connection connection, int orderId) throws SQLException {
+    public static void deleteOrderLinesForOrder(Connection connection, int orderId) throws SQLException {
         String deleteQuery = "DELETE FROM `Order Line` WHERE orderID = ?";
         try (PreparedStatement statement = connection.prepareStatement(deleteQuery)) {
             statement.setInt(1, orderId);
@@ -658,7 +658,7 @@ public final class DatabaseMethods {
 
         }
     }
-    public void addProduct(Connection connection, int productID, String productCode, String manufacturer, String name, int price, String gauge) throws SQLException {
+    public static void addProduct(Connection connection, int productID, String productCode, String manufacturer, String name, int price, String gauge) throws SQLException {
         String insertStatement = "INSERT INTO Product (productID, productCode, manufacturer, name, price, gauge) VALUES (?, ?, ?, ?, ?, ?)";
         try (PreparedStatement preparedStatement = connection.prepareStatement(insertStatement)) {
             preparedStatement.setInt(1, productID);
@@ -677,7 +677,7 @@ public final class DatabaseMethods {
     
 
 
-    public void deleteOrder(Connection connection, int orderId) throws SQLException {
+    public static void deleteOrder(Connection connection, int orderId) throws SQLException {
         deleteOrderLinesForOrder(connection, orderId);
         String deleteQuery = "DELETE FROM `Order` WHERE orderID = ?";
         try (PreparedStatement statement = connection.prepareStatement(deleteQuery)) {
@@ -686,7 +686,7 @@ public final class DatabaseMethods {
         }
     }
 
-    public ArrayList<Order> getPendingOrders(Connection connection) throws SQLException {
+    public static ArrayList<Order> getPendingOrders(Connection connection) throws SQLException {
         ArrayList<Order> pendingOrders = new ArrayList<>();
 
         String orderQuery = "SELECT * FROM `Order` WHERE status = 'Pending'";
@@ -707,7 +707,7 @@ public final class DatabaseMethods {
         return pendingOrders;
     }
 
-    private ArrayList<OrderLine> getOrderLinesForOrder(Connection connection, int orderID) throws SQLException {
+    private static ArrayList<OrderLine> getOrderLinesForOrder(Connection connection, int orderID) throws SQLException {
         ArrayList<OrderLine> orderLines = new ArrayList<>();
         String lineQuery = "SELECT * FROM `Order Line` WHERE orderID = ?";
         try (PreparedStatement lineStatement = connection.prepareStatement(lineQuery)) {
@@ -728,7 +728,7 @@ public final class DatabaseMethods {
     }
 
 
-    public void editProduct(Connection connection, int productID, String productCode, String manufacturer, String name, int price, String gauge) throws SQLException {
+    public static void editProduct(Connection connection, int productID, String productCode, String manufacturer, String name, int price, String gauge) throws SQLException {
         String updateStatement = "UPDATE Product SET productCode = ?, manufacturer = ?, name = ?, price = ?, gauge = ? WHERE productID = ?";
         try (PreparedStatement preparedStatement = connection.prepareStatement(updateStatement)) {
             preparedStatement.setString(1, productCode);
@@ -745,7 +745,7 @@ public final class DatabaseMethods {
         }
     }
 
-    public void deleteProduct(Connection connection, int productID) throws SQLException {
+    public static void deleteProduct(Connection connection, int productID) throws SQLException {
         String deleteStatement = "DELETE FROM Product WHERE productID = ?";
         try (PreparedStatement preparedStatement = connection.prepareStatement(deleteStatement)) {
             preparedStatement.setInt(1, productID);
@@ -756,7 +756,7 @@ public final class DatabaseMethods {
         }
     }
 
-    public void addBankDetails(Connection connection, String accountNumber, String sortCode, String bankName, int holderID) throws SQLException {
+    public static void addBankDetails(Connection connection, String accountNumber, String sortCode, String bankName, int holderID) throws SQLException {
         String insertStatement = "INSERT INTO BankDetails (accountNumber, sortCode, bankName, holderID) VALUES (?, ?, ?, ?)";
         try (PreparedStatement preparedStatement = connection.prepareStatement(insertStatement)) {
             preparedStatement.setString(1, accountNumber);
@@ -771,7 +771,7 @@ public final class DatabaseMethods {
         }
     }
 
-    public void editBankDetails(Connection connection, String accountNumber, String newSortCode, String newBankName, int holderID) throws SQLException {
+    public static void editBankDetails(Connection connection, String accountNumber, String newSortCode, String newBankName, int holderID) throws SQLException {
         String updateStatement = "UPDATE BankDetails SET sortCode = ?, bankName = ? WHERE accountNumber = ? AND holderID = ?";
         try (PreparedStatement preparedStatement = connection.prepareStatement(updateStatement)) {
             preparedStatement.setString(1, newSortCode);
@@ -786,7 +786,7 @@ public final class DatabaseMethods {
         }
     }
 
-    public void addProductToInventory(Connection connection, int productID, int stockLevel) throws SQLException {
+    public static void addProductToInventory(Connection connection, int productID, int stockLevel) throws SQLException {
         String insertStatement = "INSERT INTO Inventory (productID, stockLevel) VALUES (?, ?)";
         try (PreparedStatement preparedStatement = connection.prepareStatement(insertStatement)) {
             preparedStatement.setInt(1, productID);
@@ -799,7 +799,7 @@ public final class DatabaseMethods {
         }
     }
 
-    public ArrayList<Order> getPendingCustomerOrders(Connection connection, int userID) throws SQLException {
+    public static ArrayList<Order> getPendingCustomerOrders(Connection connection, int userID) throws SQLException {
         ArrayList<Order> customerOrders = new ArrayList<>();
     
         String selectStatement = "SELECT * FROM `Order` WHERE userID = ? AND status = 'Pending'";
@@ -825,7 +825,7 @@ public final class DatabaseMethods {
         return customerOrders;
     }
 
-    public ArrayList<Order> getPastCustomerOrders(Connection connection, int userID) throws SQLException {
+    public static ArrayList<Order> getPastCustomerOrders(Connection connection, int userID) throws SQLException {
         ArrayList<Order> pastOrders = new ArrayList<>();
     
         String selectStatement = "SELECT * FROM `Order` WHERE userID = ? AND status = 'Fulfilled'";
@@ -851,7 +851,7 @@ public final class DatabaseMethods {
         return pastOrders;
     }
 
-    public void editCustomerEmail(Connection connection, int userID, String newEmail) throws SQLException {
+    public static void editCustomerEmail(Connection connection, int userID, String newEmail) throws SQLException {
         String updateEmailQuery = "UPDATE Account SET email = ? WHERE userID = ?";
     
         try (PreparedStatement emailStatement = connection.prepareStatement(updateEmailQuery)) {
@@ -864,7 +864,7 @@ public final class DatabaseMethods {
         }
     }
 
-    public void editCustomerAddress(Connection connection, int holderID, HolderAddress newAddress) throws SQLException {
+    public static void editCustomerAddress(Connection connection, int holderID, HolderAddress newAddress) throws SQLException {
         String updateAddressQuery = "UPDATE HolderAddress SET houseNum = ?, roadName = ?, cityName = ?, postcode = ? WHERE holderID = ?";
     
         try (PreparedStatement addressStatement = connection.prepareStatement(updateAddressQuery)) {
@@ -881,7 +881,7 @@ public final class DatabaseMethods {
     }
     
 
-    public void registerUser(Connection connection, String email, String password, String forename, String surname, String houseNum, String roadName, String cityName, String postcode) throws SQLException {
+    public static void registerUser(Connection connection, String email, String password, String forename, String surname, String houseNum, String roadName, String cityName, String postcode) throws SQLException {
 
         connection.setAutoCommit(false);
     
@@ -928,6 +928,12 @@ public final class DatabaseMethods {
         }
     }
     
+    //public static Order startNewOrder(Connection connection, int accountID) {
+    //
+    //}
 
+    //public static int getQuantityOfProductInOrder(Connection connection, int userID, int productID) {
+
+    //}
 
 }

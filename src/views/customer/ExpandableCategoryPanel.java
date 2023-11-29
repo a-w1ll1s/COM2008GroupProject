@@ -16,16 +16,20 @@ import models.business.Track;
 import models.business.TrackPack;
 import models.database.DatabaseConnection;
 import models.database.DatabaseMethods;
+import views.CustomStyleConstants;
 import views.Manager.CustomerTableModel;
 import views.Manager.StaffTableModel;
 
 // Parent panel for the dashboard for customers, staff and managers
 class ExpandableCategoryPanel extends JPanel {
+    private ProductViewPanel parentPanel;
     private Account account;
     private JPanel productContainerPanel;
     private String category;
-
-    public ExpandableCategoryPanel(Account account, String category) {       
+    private int selectedProductID = -1;
+    
+    public ExpandableCategoryPanel(ProductViewPanel parentPanel, Account account, String category) {       
+        this.parentPanel = parentPanel;
         this.account = account;
         this.category = category;
 
@@ -45,7 +49,7 @@ class ExpandableCategoryPanel extends JPanel {
                         databaseConnection.getConnection());
 
                     for (int i = 0; i < controllers.size(); ++i)
-                        productContainerPanel.add(new ProductPanel(controllers.get(i)));
+                        productContainerPanel.add(new ProductPanel(this, controllers.get(i)));
                 
                     break;
 
@@ -54,7 +58,7 @@ class ExpandableCategoryPanel extends JPanel {
                         databaseConnection.getConnection());
                         
                     for (int i = 0; i < locomotives.size(); ++i)
-                        productContainerPanel.add(new ProductPanel(locomotives.get(i)));
+                        productContainerPanel.add(new ProductPanel(this, locomotives.get(i)));
 
                     break;
 
@@ -63,7 +67,7 @@ class ExpandableCategoryPanel extends JPanel {
                         databaseConnection.getConnection());
                         
                     for (int i = 0; i < rollingStock.size(); ++i)
-                        productContainerPanel.add(new ProductPanel(rollingStock.get(i)));
+                        productContainerPanel.add(new ProductPanel(this, rollingStock.get(i)));
 
                     break;
 
@@ -72,7 +76,7 @@ class ExpandableCategoryPanel extends JPanel {
                         databaseConnection.getConnection());
                         
                     for (int i = 0; i < track.size(); ++i)
-                        productContainerPanel.add(new ProductPanel(track.get(i)));
+                        productContainerPanel.add(new ProductPanel(this, track.get(i)));
                     
                     break;
                 
@@ -82,7 +86,7 @@ class ExpandableCategoryPanel extends JPanel {
 
                     for (int i = 0; i < trackPacks.size(); i++) {
                         ArrayList<Product> pack = trackPacks.get(i);
-                        productContainerPanel.add(new ProductPanel(pack));
+                        productContainerPanel.add(new ProductPanel(this, pack));
                     }
                     
                     break;
@@ -93,7 +97,7 @@ class ExpandableCategoryPanel extends JPanel {
 
                     for (int i = 0; i < trainSets.size(); i++) {
                         ArrayList<Product> trainSet = trainSets.get(i);
-                        productContainerPanel.add(new ProductPanel(trainSet));
+                        productContainerPanel.add(new ProductPanel(this, trainSet));
                     }
                     break;                    
             }
@@ -119,5 +123,31 @@ class ExpandableCategoryPanel extends JPanel {
 
     public String getCategory() {
         return category;
+    }
+
+    public int getSelectedProductID() {
+        return selectedProductID;
+    }
+
+    public void showSelectedProduct(int productID) {
+        if (productID == selectedProductID)
+            return;
+
+        Color defaultColour = new JPanel().getBackground();
+        for (Component comp : productContainerPanel.getComponents()) {
+            if (comp instanceof ProductPanel) {
+                ProductPanel panel = (ProductPanel)comp;
+                if (panel.getProductID() == productID) {
+                    panel.setBackground(CustomStyleConstants.SELECTED_PRODUCT_COLOUR);
+                    selectedProductID = productID;
+
+                    // Get the parent to process anything that needs to be shown when we select a product
+                    parentPanel.onSelectedProductChanged();
+                }
+                else {
+                    panel.setBackground(defaultColour);
+                }
+            }
+        }
     }
 }

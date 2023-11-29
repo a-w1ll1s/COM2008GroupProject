@@ -3,28 +3,41 @@ package views.Staff;
 import models.business.Order;
 import models.database.DatabaseConnection;
 import models.database.DatabaseMethods;
+import views.MainFrame;
+
 import javax.swing.*;
 import java.awt.*;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
-public class PendingOrderQueueView {
-    private JFrame frame;
+public class PendingOrderQueueView extends JPanel {
+    private MainFrame parentFrame;
     private JTable orderTable;
     private JButton fulfillButton, deleteButton;
     private ArrayList<Order> orders;
-    private DatabaseMethods databaseMethods;
 
-    public PendingOrderQueueView(ArrayList<Order> orders) {
-        this.orders = orders;
-        this.databaseMethods = new DatabaseMethods();
+    public PendingOrderQueueView(MainFrame parentFrame) {
+        this.parentFrame = parentFrame;
+
+        updatePendingOrders();
         initializeComponents();
         layoutComponents();
         attachEventHandlers();
     }
 
+    private void updatePendingOrders() {
+        DatabaseConnection databaseConnection = new DatabaseConnection();
+        try {
+            databaseConnection.openConnection();
+            this.orders = DatabaseMethods.getPendingOrders(databaseConnection.getConnection());
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(parentFrame, "Error fulfilling order: " + ex.getMessage());
+        } finally {
+            databaseConnection.closeConnection();
+        }
+    }
+
     private void initializeComponents() {
-        frame = new JFrame("Pending Order Queue");
         orderTable = new JTable(new OrderTableModel(orders));
         
         fulfillButton = new JButton("Fulfill Order");
@@ -32,18 +45,16 @@ public class PendingOrderQueueView {
     }
 
     private void layoutComponents() {
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setLayout(new BorderLayout());
-        frame.setSize(800, 600);
+        setLayout(new BorderLayout());
 
-        frame.add(new JScrollPane(orderTable), BorderLayout.CENTER);
+        add(new JScrollPane(orderTable), BorderLayout.CENTER);
 
         JPanel buttonPanel = new JPanel();
         buttonPanel.add(fulfillButton);
         buttonPanel.add(deleteButton);
-        frame.add(buttonPanel, BorderLayout.SOUTH);
+        add(buttonPanel, BorderLayout.SOUTH);
 
-        frame.setVisible(true);
+        setVisible(true);
     }
 
     private void attachEventHandlers() {
@@ -54,15 +65,15 @@ public class PendingOrderQueueView {
                 DatabaseConnection databaseConnection = new DatabaseConnection();
                 try {
                     databaseConnection.openConnection();
-                    databaseMethods.fulfillOrder(databaseConnection.getConnection(), order.getOrderID());
+                    DatabaseMethods.fulfillOrder(databaseConnection.getConnection(), order.getOrderID());
                     refreshOrderTable();
                 } catch (SQLException ex) {
-                    JOptionPane.showMessageDialog(frame, "Error fulfilling order: " + ex.getMessage());
+                    JOptionPane.showMessageDialog(parentFrame, "Error fulfilling order: " + ex.getMessage());
                 } finally {
                     databaseConnection.closeConnection();
                 }
             } else {
-                JOptionPane.showMessageDialog(frame, "Please select an order to fulfill.");
+                JOptionPane.showMessageDialog(parentFrame, "Please select an order to fulfill.");
             }
         });
 
@@ -73,15 +84,15 @@ public class PendingOrderQueueView {
                 DatabaseConnection databaseConnection = new DatabaseConnection();
                 try {
                     databaseConnection.openConnection();
-                    databaseMethods.deleteOrder(databaseConnection.getConnection(), order.getOrderID());
+                    DatabaseMethods.deleteOrder(databaseConnection.getConnection(), order.getOrderID());
                     refreshOrderTable();
                 } catch (SQLException ex) {
-                    JOptionPane.showMessageDialog(frame, "Error deleting order: " + ex.getMessage());
+                    JOptionPane.showMessageDialog(parentFrame, "Error deleting order: " + ex.getMessage());
                 } finally {
                     databaseConnection.closeConnection();
                 }
             } else {
-                JOptionPane.showMessageDialog(frame, "Please select an order to delete.");
+                JOptionPane.showMessageDialog(parentFrame, "Please select an order to delete.");
             }
         });
     }
@@ -90,16 +101,14 @@ public class PendingOrderQueueView {
         DatabaseConnection databaseConnection = new DatabaseConnection();
         try {
             databaseConnection.openConnection();
-            ArrayList<Order> updatedOrders = databaseMethods.getPendingOrders(databaseConnection.getConnection());
+            ArrayList<Order> updatedOrders = DatabaseMethods.getPendingOrders(databaseConnection.getConnection());
             orderTable.setModel(new OrderTableModel(updatedOrders));
             this.orders = updatedOrders;
         } catch (SQLException ex) {
-            JOptionPane.showMessageDialog(frame, "Error refreshing orders: " + ex.getMessage());
+            JOptionPane.showMessageDialog(parentFrame, "Error refreshing orders: " + ex.getMessage());
         } finally {
             databaseConnection.closeConnection();
         }
-    
-        
     }
 
 }
