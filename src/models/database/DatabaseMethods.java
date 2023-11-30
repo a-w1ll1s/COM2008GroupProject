@@ -911,6 +911,15 @@ public final class DatabaseMethods {
         connection.setAutoCommit(false);
     
         try {
+            String insertAddress = "INSERT INTO HolderAddress (houseNum, roadName, cityName, postcode) VALUES (?, ?, ?, ?)";
+            try (PreparedStatement addressStatement = connection.prepareStatement(insertAddress)) {
+                addressStatement.setString(1, houseNum);
+                addressStatement.setString(2, roadName);
+                addressStatement.setString(3, cityName);
+                addressStatement.setString(4, postcode);
+                addressStatement.executeUpdate();
+            }
+        
             String insertHolder = "INSERT INTO AccountHolder (forename, surname, houseNum, postcode) VALUES (?, ?, ?, ?)";
             try (PreparedStatement holderStatement = connection.prepareStatement(insertHolder, Statement.RETURN_GENERATED_KEYS)) {
                 holderStatement.setString(1, forename);
@@ -918,20 +927,11 @@ public final class DatabaseMethods {
                 holderStatement.setString(3, houseNum);
                 holderStatement.setString(4, postcode);
                 holderStatement.executeUpdate();
-    
+        
                 ResultSet holderKeys = holderStatement.getGeneratedKeys();
                 if (holderKeys.next()) {
                     int holderID = holderKeys.getInt(1);
-    
-                    String insertAddress = "INSERT INTO HolderAddress (houseNum, roadName, cityName, postcode) VALUES (?, ?, ?, ?)";
-                    try (PreparedStatement addressStatement = connection.prepareStatement(insertAddress)) {
-                        addressStatement.setString(1, houseNum);
-                        addressStatement.setString(2, roadName);
-                        addressStatement.setString(3, cityName);
-                        addressStatement.setString(4, postcode);
-                        addressStatement.executeUpdate();
-                    }
-    
+        
                     String insertAccount = "INSERT INTO Account (email, password, holderID, isCustomer, isStaff, isManager) VALUES (?, ?, ?, TRUE, FALSE, FALSE)";
                     try (PreparedStatement accountStatement = connection.prepareStatement(insertAccount)) {
                         accountStatement.setString(1, email);
@@ -941,9 +941,9 @@ public final class DatabaseMethods {
                     }
                 }
             }
-    
+        
             connection.commit();
-    
+        
         } catch (SQLException e) {
             connection.rollback();
             e.printStackTrace();
@@ -951,14 +951,49 @@ public final class DatabaseMethods {
         } finally {
             connection.setAutoCommit(true);
         }
-    }
     
-    //public static Order startNewOrder(Connection connection, int accountID) {
-    //
-    //}
+    }
 
-    //public static int getQuantityOfProductInOrder(Connection connection, int userID, int productID) {
+    public void addOrder(Connection connection, Order order) throws SQLException{
 
-    //}
+        try {
+
+            String insertStatement = "INSERT INTO Order (orderID, userID, date, status) VALUES (?, ?, ?, ?)";
+            PreparedStatement preparedStatement = connection.prepareStatement(insertStatement);
+
+            preparedStatement.setInt(1, order.getOrderID());
+            preparedStatement.setInt(2, order.getUserID());
+            preparedStatement.setInt(1, order.getDate());
+            preparedStatement.setString(1, order.getStatus());
+
+            preparedStatement.executeUpdate();
+           
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw e;
+        }
+
+    }
+
+    public void addOrderLine(Connection connection, int orderID, OrderLine orderLine) throws SQLException{
+
+        try {
+
+            String insertStatement = "INSERT INTO `Order Line` (orderID, lineID, productID, quantity) VALUES (?, ?, ?, ?)";
+            PreparedStatement preparedStatement = connection.prepareStatement(insertStatement);
+
+            preparedStatement.setInt(1, orderID);
+            preparedStatement.setInt(2, orderLine.getLineNum());
+            preparedStatement.setInt(1, orderLine.getProduct().getProductID());
+            preparedStatement.setInt(1, orderLine.getQuantity());
+
+            preparedStatement.executeUpdate();
+           
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw e;
+        }
+
+    }
 
 }
