@@ -38,7 +38,7 @@ class NavigationBarPanel extends JPanel {
         JButton browserProductsButton = new JButton("Browse Products");
         browserProductsButton.setBackground(CustomStyleConstants.TOGGLED_NAV_BUTTON_COLOUR);
         browserProductsButton.addActionListener(e -> {
-            parentPanel.switchToProductsView();
+            parentPanel.switchToCustomerView();
             showSelectedButton(browserProductsButton);
         });
 

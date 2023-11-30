@@ -15,7 +15,6 @@ import models.business.Locomotive;
 import models.business.Product;
 import models.business.RollingStock;
 import models.business.Track;
-import views.CustomStyleConstants;
 
 class ProductPanel extends JPanel {
     private int productID;

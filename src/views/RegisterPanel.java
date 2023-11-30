@@ -2,12 +2,16 @@ package views;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.sql.SQLException;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 
 import helpers.ViewHelpers;
-import views.DashboardPanel;
+import models.business.Account;
+import models.database.DatabaseConnection;
+import models.database.DatabaseMethods;
+import views.customer.CustomerPanel;
 
 class RegisterPanel extends JPanel {
     private MainFrame parentFrame;
@@ -266,13 +270,39 @@ class RegisterPanel extends JPanel {
         // Check email format
         if (!(email.contains("@") && email.contains((".")))) {
             emailErrorLabel.setText("Invalid email");
+    }
+        
+        DatabaseConnection databaseConnection = new DatabaseConnection();
+        Account account = null;
+        
+        try {
+            databaseConnection.openConnection();
+            DatabaseMethods.registerUser(databaseConnection.getConnection(), 
+                email,
+                password,
+                forename,
+                surname,
+                houseNumber,
+                roadName,
+                cityName,
+                postcode);
+
+            account = DatabaseMethods.getAccountDetails(databaseConnection.getConnection(), email);
+        } 
+        catch (SQLException ex) {
+            JOptionPane.showMessageDialog(this, "Error registering user: " + ex.getMessage());
+            return;
+        } 
+        finally {
+            databaseConnection.closeConnection();
         }
 
-        // TODO: Sort registering...
+        if (account == null)
+            return;
 
         // Successful register so automatically login.
-        //parentFrame.showPage(new CustomerPanel(parentFrame));
-    }
 
-    
+        parentFrame.showPage(new DashboardPanel(parentFrame, account));
+        
+    }
 }
