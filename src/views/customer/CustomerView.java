@@ -66,7 +66,7 @@ public class CustomerView extends JPanel {
     }
 
     public void switchToConfirmOrderView() {
-        ConfirmOrderPanel confirmOrderPanel = new ConfirmOrderPanel(parentFrame, customer, order);
+        ConfirmOrderPanel confirmOrderPanel = new ConfirmOrderPanel(this, parentFrame, customer, order);
         switchToPanelView(confirmOrderPanel);
     }
 

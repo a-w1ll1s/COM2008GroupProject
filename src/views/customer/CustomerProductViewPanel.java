@@ -19,6 +19,7 @@ public class CustomerProductViewPanel extends JPanel {
     private ProductViewPanel productViewPanel;
     private Account account;
     private JSpinner quantitySpinner;
+    private JPanel optionsPanel;
     
     public CustomerProductViewPanel(CustomerView customerView, Account account) {        
         this.customerView = customerView;
@@ -31,8 +32,16 @@ public class CustomerProductViewPanel extends JPanel {
         productViewPanelConstraints.weighty = 1;
         productViewPanel = new ProductViewPanel(this);
 
+        add(productViewPanel, productViewPanelConstraints);
+        setupOptionsPanel();
+    }
+
+    private void setupOptionsPanel() {
         // Options panel
-        JPanel optionsPanel = new JPanel();
+        if (optionsPanel != null)
+            remove(optionsPanel);
+
+        optionsPanel = new JPanel();
         optionsPanel.setLayout(new GridBagLayout());
         GridBagConstraints optionsPanelConstraints = new GridBagConstraints();
         optionsPanelConstraints.fill = GridBagConstraints.BOTH;
@@ -77,6 +86,8 @@ public class CustomerProductViewPanel extends JPanel {
                 JOptionPane.showMessageDialog(customerView.getFrame(), "Please select a product!");
                 return;
             }
+
+            // TODO: ACTUALLY REMOVE FROM ORDER
         });
 
         JLabel quantityLabel = new JLabel("Order Quantity: ");
@@ -85,8 +96,28 @@ public class CustomerProductViewPanel extends JPanel {
         quantitySpinner.addChangeListener(new ChangeListener() {
             @Override
             public void stateChanged(ChangeEvent e) {
-                JSpinner s = (JSpinner) e.getSource();
-                System.out.println(s.getValue().toString());
+                int newQuantity = (int)((JSpinner)e.getSource()).getValue();
+                
+                DatabaseConnection databaseConnection = new DatabaseConnection();
+                try {
+                    databaseConnection.openConnection();
+
+                    Order order = customerView.getOrder();
+                    OrderLine orderLine = DatabaseMethods.createOrUpdateOrderLine(databaseConnection.getConnection(),
+                        order.getOrderID(),
+                        productViewPanel.getSelectedProduct(),
+                        newQuantity
+                    );
+
+                    order.addOrUpdateOrderLine(orderLine);
+                    customerView.setOrder(order);
+                } 
+                catch (SQLException ex) {
+                    return;
+                } 
+                finally {
+                    databaseConnection.closeConnection();
+                }                
             }
         });
 
@@ -95,7 +126,10 @@ public class CustomerProductViewPanel extends JPanel {
         optionsPanel.add(quantityLabel, optionButtonConstraints);
         optionsPanel.add(quantitySpinner);
 
-        add(productViewPanel, productViewPanelConstraints);
+        optionsPanel.revalidate();
+        optionsPanel.repaint();
+        optionsPanel.setVisible(true);
+
         add(optionsPanel, optionsPanelConstraints);
     }
     
@@ -127,9 +161,17 @@ public class CustomerProductViewPanel extends JPanel {
             databaseConnection.openConnection();
 
             order = customerView.getOrder();
-            OrderLine orderLine = DatabaseMethods.createOrIncrementOrderLine(databaseConnection.getConnection(),
+            OrderLine before = order.getOrderLine(productViewPanel.getSelectedProductID()); 
+
+            int newQuantity = 1;
+            if (before != null) {
+                newQuantity = before.getQuantity() + 1;
+            }
+
+            OrderLine orderLine = DatabaseMethods.createOrUpdateOrderLine(databaseConnection.getConnection(),
                 order.getOrderID(),
-                productViewPanel.getSelectedProduct()
+                productViewPanel.getSelectedProduct(),
+                newQuantity
             );
 
             System.out.println(orderLine);
@@ -148,13 +190,12 @@ public class CustomerProductViewPanel extends JPanel {
     }
 
     public void onSelectedProductChanged() {
+        setupOptionsPanel();
         if (quantitySpinner == null)
             return;
 
-        // TODO: Set the quantity to the current quantity of the product in the order
         OrderLine line = customerView.getOrder().getOrderLine(productViewPanel.getSelectedProductID());
         if (line == null) {
-            System.out.println("order line is null in on selected");
             quantitySpinner.setValue(0);
         }
         else {

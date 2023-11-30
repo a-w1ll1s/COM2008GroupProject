@@ -38,8 +38,10 @@ class OrderPanel extends JPanel {
     private JTextField bankBrandTextField, bankExpiryTextField, bankCardNumberTextField, bankSecurityCodeTextField;
     private final int ENTRY_COLUMNS = 15;
     private JPanel contentsPanel;
+    private CustomerView customerView;
 
-    public OrderPanel(Order order, Customer customer) {
+    public OrderPanel(CustomerView customerView, Order order, Customer customer) {
+        this.customerView = customerView;
         this.order = order;
         this.customer = customer;
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
@@ -184,7 +186,7 @@ class OrderPanel extends JPanel {
             if (line == null)
                 continue;
 
-            contentsPanel.add(new OrderLinePanel(this, line), ViewHelpers.getGridBagConstraints(0, i));
+            contentsPanel.add(new OrderLinePanel(customerView, this, line), ViewHelpers.getGridBagConstraints(0, i));
             i++;
         }
 

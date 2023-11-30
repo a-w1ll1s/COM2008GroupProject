@@ -1000,16 +1000,15 @@ public final class DatabaseMethods {
 
     }
 
-    public static OrderLine createOrIncrementOrderLine(Connection connection, int orderID, Product product) 
+    public static OrderLine createOrUpdateOrderLine(Connection connection, int orderID, Product product, 
+        int newQuantity) 
         throws SQLException {
 
         ArrayList<OrderLine> orderLines = getOrderLinesForOrder(connection, orderID);
         int lineID = -1;
-        int quantity = 0;
         for (int i = 0; i < orderLines.size(); ++i) {
             if (orderLines.get(i).getProduct().getProductID() == product.getProductID()) {
                 lineID = i;
-                quantity = orderLines.get(i).getQuantity();
                 break;
             }
         }
@@ -1032,23 +1031,22 @@ public final class DatabaseMethods {
 
                 preparedInsertStatement.executeUpdate();
 
-                
-
                 return new OrderLine(lineID, product, 1);
             }
             else {
-                String updateStatement = "UPDATE `Order Line` SET quantity = quantity + 1 "
+                String updateStatement = "UPDATE `Order Line` SET quantity = ? "
                     + "WHERE orderID = ? AND lineID = ? AND productID = ?";
                     
                 PreparedStatement preparedUpdateStatement = connection.prepareStatement(updateStatement);
 
-                preparedUpdateStatement.setInt(1, orderID);
-                preparedUpdateStatement.setInt(2, lineID);
-                preparedUpdateStatement.setInt(3, product.getProductID());
+                preparedUpdateStatement.setInt(1, newQuantity);
+                preparedUpdateStatement.setInt(2, orderID);
+                preparedUpdateStatement.setInt(3, lineID);
+                preparedUpdateStatement.setInt(4, product.getProductID());
 
                 preparedUpdateStatement.executeUpdate();
 
-                return new OrderLine(lineID, product, quantity + 1);
+                return new OrderLine(lineID, product, newQuantity);
             }            
         } catch (SQLException e) {
             e.printStackTrace();

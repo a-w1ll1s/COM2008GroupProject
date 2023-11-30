@@ -13,8 +13,10 @@ public class ConfirmOrderPanel extends JPanel {
     private MainFrame parentFrame;
     private Customer customer;
     private Order order;
+    private CustomerView customerView;
 
-    public ConfirmOrderPanel(MainFrame frame, Customer customer, Order order) {        
+    public ConfirmOrderPanel(CustomerView customerView, MainFrame frame, Customer customer, Order order) {     
+        this.customerView = customerView;   
         parentFrame = frame;
         this.customer = customer;
         this.order = order;
@@ -25,7 +27,7 @@ public class ConfirmOrderPanel extends JPanel {
     }
 
     private void layoutComponents() {
-        OrderPanel orderPanel = new OrderPanel(order, customer);
+        OrderPanel orderPanel = new OrderPanel(customerView, order, customer);
 
         GridBagConstraints orderPanelConstraints = new GridBagConstraints();
         orderPanelConstraints.fill = GridBagConstraints.BOTH;
