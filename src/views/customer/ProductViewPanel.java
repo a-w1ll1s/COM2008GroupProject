@@ -5,6 +5,8 @@ import java.util.ArrayList;
 
 import javax.swing.*;
 
+import models.business.Order;
+import models.business.Product;
 import views.CustomStyleConstants;
 
 public class ProductViewPanel extends JPanel {
@@ -77,6 +79,9 @@ public class ProductViewPanel extends JPanel {
 
     public int getSelectedProductID() {
         return selectedCategory.getSelectedProductID();
+    }
+    public Product getSelectedProduct() {
+        return selectedCategory.getSelectedProduct();
     }
 
     public void onSelectedProductChanged() {

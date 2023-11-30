@@ -17,19 +17,17 @@ import models.business.RollingStock;
 import models.business.Track;
 
 class ProductPanel extends JPanel {
-    private int productID;
-    private Boolean isInBasket;
-    private int orderQuantity;
+    private Product product;
     private Font boldFont = new Font("", Font.BOLD, 14);
     private ExpandableCategoryPanel parentPanel;
 
-    public int getProductID() {
-        return productID;
+    public Product getProduct() {
+        return product;
     }
 
     private void setup(ExpandableCategoryPanel parentPanel, Product product) {
         this.parentPanel = parentPanel; 
-        productID = product.getProductID();
+        this.product = product;
 
         setLayout(new GridLayout(0, 2)); // TODO: Change to 3 and add buttons to the right?
         setBorder(BorderFactory.createLoweredSoftBevelBorder());
@@ -37,7 +35,7 @@ class ProductPanel extends JPanel {
         addMouseListener(new MouseAdapter() {
             @Override
             public void mouseReleased(MouseEvent e) {
-                parentPanel.showSelectedProduct(productID);
+                parentPanel.showSelectedProduct(product.getProductID());
             }
         });
 

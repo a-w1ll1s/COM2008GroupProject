@@ -5,6 +5,7 @@ import java.awt.*;
 import javax.swing.*;
 
 import models.business.Account;
+import models.business.Customer;
 import views.Manager.ManagerView;
 import views.Staff.StaffView;
 import views.customer.CustomerView;
@@ -15,6 +16,7 @@ class DashboardPanel extends JPanel {
     private MainFrame parentFrame;
     private Account account;
     private JPanel containerPanel;
+    private CustomerView customerView;
 
     public DashboardPanel(MainFrame frame, Account account) {        
         parentFrame = frame;
@@ -38,6 +40,15 @@ class DashboardPanel extends JPanel {
         add(containerPanel);
         
         // Start on customer panel
+        Customer customer = new Customer(account.getUserID(), 
+            account.getEmail(),
+            account.getPassword(),
+            account.isCustomer(),
+            account.isStaff(),
+            account.isManager(),
+            account.getHolder());
+        customerView = new CustomerView(frame, customer);
+
         switchToCustomerView();
     }
 
@@ -55,7 +66,8 @@ class DashboardPanel extends JPanel {
     }
 
     public void switchToCustomerView() {
-        switchToPanelView(new CustomerView(parentFrame));
+        customerView.switchToProductsView();
+        switchToPanelView(customerView);
     }
 
     public void switchToOrderHistoryView() {

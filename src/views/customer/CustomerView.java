@@ -11,11 +11,11 @@ import java.awt.*;
 public class CustomerView extends JPanel {
     private MainFrame parentFrame;
     private CustomerProductViewPanel productViewPanel;
-    private ConfirmOrderPanel confirmOrderPanel;
-    private Account account;
+    private Customer customer;
 
-    public CustomerView(MainFrame parentFrame) {
+    public CustomerView(MainFrame parentFrame, Customer customer) {
         this.parentFrame = parentFrame;
+        this.customer = customer;
 
         initializeComponents();
         layoutComponents();
@@ -27,7 +27,7 @@ public class CustomerView extends JPanel {
     private void layoutComponents() {
         setLayout(new BorderLayout());
 
-        productViewPanel = new CustomerProductViewPanel(this);
+        productViewPanel = new CustomerProductViewPanel(this, customer);
         add(productViewPanel);
     }
 
@@ -36,7 +36,7 @@ public class CustomerView extends JPanel {
     }
 
     public void switchToConfirmOrderView(Order order) {
-        ConfirmOrderPanel confirmOrderPanel = new ConfirmOrderPanel(parentFrame, account, order);
+        ConfirmOrderPanel confirmOrderPanel = new ConfirmOrderPanel(parentFrame, customer, order);
         switchToPanelView(confirmOrderPanel);
     }
 

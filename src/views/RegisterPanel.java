@@ -11,7 +11,6 @@ import helpers.ViewHelpers;
 import models.business.Account;
 import models.database.DatabaseConnection;
 import models.database.DatabaseMethods;
-import views.customer.CustomerPanel;
 
 class RegisterPanel extends JPanel {
     private MainFrame parentFrame;
