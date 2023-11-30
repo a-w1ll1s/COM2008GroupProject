@@ -19,7 +19,7 @@ public class StaffProductViewPanel extends JPanel {
         productViewPanelConstraints.fill = GridBagConstraints.BOTH;
         productViewPanelConstraints.weightx = 1;
         productViewPanelConstraints.weighty = 1;
-        productViewPanel = new ProductViewPanel();
+        productViewPanel = new ProductViewPanel(this);
 
 
         // Options panel
@@ -43,5 +43,9 @@ public class StaffProductViewPanel extends JPanel {
 
         add(productViewPanel, productViewPanelConstraints);
         add(optionsPanel, optionsPanelConstraints);
+    }
+
+    public void onSelectedProductChanged() {
+        
     }
 }

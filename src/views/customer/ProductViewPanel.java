@@ -6,16 +6,18 @@ import java.util.ArrayList;
 import javax.swing.*;
 
 import models.business.Order;
+import models.business.OrderLine;
 import models.business.Product;
 import views.CustomStyleConstants;
+import views.Staff.StaffProductViewPanel;
 
 public class ProductViewPanel extends JPanel {
-    private JPanel mainPanel, optionsPanel;
+    private JPanel mainPanel, optionsPanel, parentPanel;
     private ExpandableCategoryPanel selectedCategory;
     private ArrayList<JButton> categoryButtons = new ArrayList<>();
-    private JSpinner quantitySpinner;
 
-    public ProductViewPanel() {        
+    public ProductViewPanel(JPanel parentPanel) {
+        this.parentPanel = parentPanel;
         setLayout(new GridBagLayout());
 
         mainPanel = new JPanel();
@@ -84,12 +86,6 @@ public class ProductViewPanel extends JPanel {
         return selectedCategory.getSelectedProduct();
     }
 
-    public void onSelectedProductChanged() {
-        // TODO: Set the quantity to the current quantity of the product in the order
-        //quantitySpinner.setValue();
-    }
-
-
     private void selectCategory(String category) {
         // Check we're not already on the category
         if (selectedCategory != null && category.equals(selectedCategory.getCategory())) 
@@ -115,5 +111,14 @@ public class ProductViewPanel extends JPanel {
         revalidate();
         repaint();
         setVisible(true);        
+    }
+
+    public void onSelectedProductChanged() {
+        if (parentPanel instanceof CustomerProductViewPanel) {
+            ((CustomerProductViewPanel)parentPanel).onSelectedProductChanged();
+        }
+        else if (parentPanel instanceof StaffProductViewPanel) {
+            ((StaffProductViewPanel)parentPanel).onSelectedProductChanged();
+        }
     }
 }

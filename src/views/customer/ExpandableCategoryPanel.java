@@ -150,7 +150,6 @@ class ExpandableCategoryPanel extends JPanel {
                     panel.setBackground(CustomStyleConstants.SELECTED_PRODUCT_COLOUR);
                     selectedProduct = product;
 
-
                     // Get the parent to process anything that needs to be shown when we select a product
                     parentPanel.onSelectedProductChanged();
                 }

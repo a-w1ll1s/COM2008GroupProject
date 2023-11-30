@@ -1004,7 +1004,7 @@ public final class DatabaseMethods {
         throws SQLException {
 
         ArrayList<OrderLine> orderLines = getOrderLinesForOrder(connection, orderID);
-        int lineID = 0;
+        int lineID = -1;
         int quantity = 0;
         for (int i = 0; i < orderLines.size(); ++i) {
             if (orderLines.get(i).getProduct().getProductID() == product.getProductID()) {
@@ -1014,22 +1014,42 @@ public final class DatabaseMethods {
             }
         }
 
-
-
         try {
-            String insertStatement = "INSERT INTO `Order Line` (lineID, orderID, productID, quantity) "
-                + "VALUES (?, ?, ?, 1) ON DUPLICATE KEY UPDATE quantity = quantity + 1";
+            // If we didn't find an existing order line
+            if (lineID == -1) {
+                
+                lineID = orderLines.size();
+                System.out.println("new lineID + " + lineID);
+
+                String insertStatement = "INSERT INTO `Order Line` (lineID, orderID, productID, quantity) "
+                + "VALUES (?, ?, ?, 1)";
                     
-            PreparedStatement preparedStatement = connection.prepareStatement(insertStatement);
+                PreparedStatement preparedInsertStatement = connection.prepareStatement(insertStatement);
+                
+                preparedInsertStatement.setInt(1, lineID);
+                preparedInsertStatement.setInt(2, orderID);
+                preparedInsertStatement.setInt(3, product.getProductID());
 
-            preparedStatement.setInt(1, lineID);
-            preparedStatement.setInt(2, orderID);
-            preparedStatement.setInt(3, product.getProductID());
+                preparedInsertStatement.executeUpdate();
 
-            preparedStatement.executeUpdate();
+                
 
-            return new OrderLine(lineID, product, quantity + 1);
-           
+                return new OrderLine(lineID, product, 1);
+            }
+            else {
+                String updateStatement = "UPDATE `Order Line` SET quantity = quantity + 1 "
+                    + "WHERE orderID = ? AND lineID = ? AND productID = ?";
+                    
+                PreparedStatement preparedUpdateStatement = connection.prepareStatement(updateStatement);
+
+                preparedUpdateStatement.setInt(1, orderID);
+                preparedUpdateStatement.setInt(2, lineID);
+                preparedUpdateStatement.setInt(3, product.getProductID());
+
+                preparedUpdateStatement.executeUpdate();
+
+                return new OrderLine(lineID, product, quantity + 1);
+            }            
         } catch (SQLException e) {
             e.printStackTrace();
             throw e;

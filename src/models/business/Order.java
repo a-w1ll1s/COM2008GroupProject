@@ -31,6 +31,16 @@ public class Order {
         orderLines.add(orderLine);
     }
 
+    public void addOrUpdateOrderLine(OrderLine orderLine) {
+        for (int i = 0; i < orderLines.size(); ++i) {
+            if (orderLines.get(i).getLineNum() == orderLine.getLineNum()) {
+                orderLines.set(i, orderLine);
+                return;
+            }
+        }
+        addOrderLine(orderLine);
+    }
+
     public void deleteOrderLine(OrderLine orderLine) {
         orderLines.remove(orderLine.getLineNum());
     }
@@ -80,5 +90,14 @@ public class Order {
 
     public ArrayList<OrderLine> getOrderLines() {
         return orderLines;
+    }
+
+    public OrderLine getOrderLine(int productID) {
+        for (OrderLine line : orderLines) {
+            if (line.getProduct().getProductID() == productID) {
+                return line;
+            }
+        }
+        return null;
     }
 }

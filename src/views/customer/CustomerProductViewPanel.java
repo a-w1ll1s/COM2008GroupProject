@@ -13,13 +13,12 @@ import models.business.Order;
 import models.business.OrderLine;
 import models.database.DatabaseConnection;
 import models.database.DatabaseMethods;
-import views.MainFrame;
 
 public class CustomerProductViewPanel extends JPanel {
     private CustomerView customerView;
     private ProductViewPanel productViewPanel;
-    private Order order;
     private Account account;
+    private JSpinner quantitySpinner;
     
     public CustomerProductViewPanel(CustomerView customerView, Account account) {        
         this.customerView = customerView;
@@ -30,7 +29,7 @@ public class CustomerProductViewPanel extends JPanel {
         productViewPanelConstraints.fill = GridBagConstraints.BOTH;
         productViewPanelConstraints.weightx = 1;
         productViewPanelConstraints.weighty = 1;
-        productViewPanel = new ProductViewPanel();
+        productViewPanel = new ProductViewPanel(this);
 
         // Options panel
         JPanel optionsPanel = new JPanel();
@@ -39,39 +38,13 @@ public class CustomerProductViewPanel extends JPanel {
         optionsPanelConstraints.fill = GridBagConstraints.BOTH;
         optionsPanelConstraints.weightx = 1;
         optionsPanelConstraints.gridy = 1;
-        
-        // Try find a previous order
-        DatabaseConnection databaseConnection = new DatabaseConnection();
-        try {
-            databaseConnection.openConnection();
-            ArrayList<Order> pendingOrders = DatabaseMethods.getPendingCustomerOrders(
-                databaseConnection.getConnection(), 
-                account.getUserID());
-
-            if (pendingOrders.size() != 0) {
-                order = pendingOrders.get(0);
-
-                for (OrderLine orderLine : DatabaseMethods.getOrderLinesForOrder(databaseConnection.getConnection(), 
-                    order.getOrderID())) {
-                    
-                    order.addOrderLine(orderLine);
-                }
-            }                 
-        } 
-        catch (SQLException ex) {
-            JOptionPane.showMessageDialog(this, "Error getting orders: " + ex.getMessage());
-            return;
-        } 
-        finally {
-            databaseConnection.closeConnection();
-        }
-
 
         GridBagConstraints optionButtonConstraints = new GridBagConstraints();
         optionButtonConstraints.insets = new Insets(5, 5, 5, 5);
 
         JButton confirmOrderButton = new JButton("Confirm order");
         confirmOrderButton.addActionListener(e -> {
+            Order order = customerView.getOrder();
             if (order == null) {
                 JOptionPane.showMessageDialog(customerView.getFrame(), "Add a product first!");
             }
@@ -80,7 +53,7 @@ public class CustomerProductViewPanel extends JPanel {
                     JOptionPane.showMessageDialog(customerView.getFrame(), "Add a product first!");
                 }
                 else {
-                    customerView.switchToConfirmOrderView(order);
+                    customerView.switchToConfirmOrderView();
                 }
             }
         });
@@ -90,6 +63,12 @@ public class CustomerProductViewPanel extends JPanel {
         JButton addToOrderButton = new JButton("Add to order");
         addToOrderButton.addActionListener(e -> {
             addSelectedProductToOrder(); 
+            quantitySpinner.setValue(
+                customerView.getOrder().getOrderLine(productViewPanel.getSelectedProductID()).getQuantity());
+            quantitySpinner.revalidate();
+            quantitySpinner.repaint();
+            quantitySpinner.setVisible(true);
+
         });
 
         JButton removeFromOrderButton = new JButton("Remove from order");
@@ -101,7 +80,7 @@ public class CustomerProductViewPanel extends JPanel {
         });
 
         JLabel quantityLabel = new JLabel("Order Quantity: ");
-        JSpinner quantitySpinner = new JSpinner(new SpinnerNumberModel(0, 0, 100, 1));
+        quantitySpinner = new JSpinner(new SpinnerNumberModel(0, 0, 100, 1));
 
         quantitySpinner.addChangeListener(new ChangeListener() {
             @Override
@@ -119,7 +98,7 @@ public class CustomerProductViewPanel extends JPanel {
         add(productViewPanel, productViewPanelConstraints);
         add(optionsPanel, optionsPanelConstraints);
     }
-
+    
     private void addSelectedProductToOrder() {
         if (productViewPanel.getSelectedProductID() == -1) {
             JOptionPane.showMessageDialog(customerView.getFrame(), "Please select a product!");
@@ -127,11 +106,15 @@ public class CustomerProductViewPanel extends JPanel {
         }
 
         DatabaseConnection databaseConnection = new DatabaseConnection();
+        Order order = customerView.getOrder();
+        
         if (order == null) {
             try {
                 databaseConnection.openConnection();
                 order = DatabaseMethods.createNewOrGetPendingOrder(databaseConnection.getConnection(), 
                     account.getUserID());
+
+                customerView.setOrder(order);
             } 
             catch (SQLException ex) {
                 JOptionPane.showMessageDialog(this, "Error creating/getting order: " + ex.getMessage());
@@ -143,22 +126,17 @@ public class CustomerProductViewPanel extends JPanel {
         try {
             databaseConnection.openConnection();
 
+            order = customerView.getOrder();
             OrderLine orderLine = DatabaseMethods.createOrIncrementOrderLine(databaseConnection.getConnection(),
                 order.getOrderID(),
                 productViewPanel.getSelectedProduct()
             );
 
-            Boolean orderLineExists = false;
-            for (OrderLine line : order.getOrderLines()) {
-                if (line.getLineNum() == orderLine.getLineNum()) {
-                    orderLineExists = true;
-                    line.setQuantity(orderLine.getQuantity());
-                }
-            }
-            if (!orderLineExists) {
-                order.addOrderLine(orderLine);
-            }
-            
+            System.out.println(orderLine);
+
+            order.addOrUpdateOrderLine(orderLine);
+            customerView.setOrder(order);
+            System.out.println(customerView.getOrder().getOrderLines() + " 2");
         } 
         catch (SQLException ex) {
             JOptionPane.showMessageDialog(this, "Error creating order line: " + ex.getMessage());
@@ -167,5 +145,23 @@ public class CustomerProductViewPanel extends JPanel {
         finally {
             databaseConnection.closeConnection();
         }
+    }
+
+    public void onSelectedProductChanged() {
+        if (quantitySpinner == null)
+            return;
+
+        // TODO: Set the quantity to the current quantity of the product in the order
+        OrderLine line = customerView.getOrder().getOrderLine(productViewPanel.getSelectedProductID());
+        if (line == null) {
+            System.out.println("order line is null in on selected");
+            quantitySpinner.setValue(0);
+        }
+        else {
+            quantitySpinner.setValue(line.getQuantity());
+        }
+        quantitySpinner.revalidate();
+        quantitySpinner.repaint();
+        quantitySpinner.setVisible(true);
     }
 }
