@@ -963,8 +963,8 @@ public final class DatabaseMethods {
 
             preparedStatement.setInt(1, order.getOrderID());
             preparedStatement.setInt(2, order.getUserID());
-            preparedStatement.setInt(1, order.getDate());
-            preparedStatement.setString(1, order.getStatus());
+            preparedStatement.setInt(3, order.getDate());
+            preparedStatement.setString(4, order.getStatus());
 
             preparedStatement.executeUpdate();
            
@@ -984,8 +984,8 @@ public final class DatabaseMethods {
 
             preparedStatement.setInt(1, orderID);
             preparedStatement.setInt(2, orderLine.getLineNum());
-            preparedStatement.setInt(1, orderLine.getProduct().getProductID());
-            preparedStatement.setInt(1, orderLine.getQuantity());
+            preparedStatement.setInt(3, orderLine.getProduct().getProductID());
+            preparedStatement.setInt(4, orderLine.getQuantity());
 
             preparedStatement.executeUpdate();
            
