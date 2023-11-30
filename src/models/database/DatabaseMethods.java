@@ -1029,6 +1029,7 @@ public final class DatabaseMethods {
                 preparedInsertStatement.setInt(2, orderID);
                 preparedInsertStatement.setInt(3, product.getProductID());
 
+<<<<<<< HEAD
                 preparedInsertStatement.executeUpdate();
 
                 return new OrderLine(lineID, product, 1);
@@ -1068,6 +1069,12 @@ public final class DatabaseMethods {
             preparedStatement.setInt(2, orderLine.getLineNum());
             preparedStatement.setInt(3, orderID);
             preparedStatement.setInt(4, orderLine.getProduct().getProductID());
+=======
+            preparedStatement.setInt(1, orderID);
+            preparedStatement.setInt(2, orderLine.getLineNum());
+            preparedStatement.setInt(3, orderLine.getProduct().getProductID());
+            preparedStatement.setInt(4, orderLine.getQuantity());
+>>>>>>> f4851bcbb321be729fa04cb986755bcba0bb4494
 
             preparedStatement.executeUpdate();
 
