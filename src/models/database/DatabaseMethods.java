@@ -911,6 +911,15 @@ public final class DatabaseMethods {
         connection.setAutoCommit(false);
     
         try {
+            String insertAddress = "INSERT INTO HolderAddress (houseNum, roadName, cityName, postcode) VALUES (?, ?, ?, ?)";
+            try (PreparedStatement addressStatement = connection.prepareStatement(insertAddress)) {
+                addressStatement.setString(1, houseNum);
+                addressStatement.setString(2, roadName);
+                addressStatement.setString(3, cityName);
+                addressStatement.setString(4, postcode);
+                addressStatement.executeUpdate();
+            }
+        
             String insertHolder = "INSERT INTO AccountHolder (forename, surname, houseNum, postcode) VALUES (?, ?, ?, ?)";
             try (PreparedStatement holderStatement = connection.prepareStatement(insertHolder, Statement.RETURN_GENERATED_KEYS)) {
                 holderStatement.setString(1, forename);
@@ -918,20 +927,11 @@ public final class DatabaseMethods {
                 holderStatement.setString(3, houseNum);
                 holderStatement.setString(4, postcode);
                 holderStatement.executeUpdate();
-    
+        
                 ResultSet holderKeys = holderStatement.getGeneratedKeys();
                 if (holderKeys.next()) {
                     int holderID = holderKeys.getInt(1);
-    
-                    String insertAddress = "INSERT INTO HolderAddress (houseNum, roadName, cityName, postcode) VALUES (?, ?, ?, ?)";
-                    try (PreparedStatement addressStatement = connection.prepareStatement(insertAddress)) {
-                        addressStatement.setString(1, houseNum);
-                        addressStatement.setString(2, roadName);
-                        addressStatement.setString(3, cityName);
-                        addressStatement.setString(4, postcode);
-                        addressStatement.executeUpdate();
-                    }
-    
+        
                     String insertAccount = "INSERT INTO Account (email, password, holderID, isCustomer, isStaff, isManager) VALUES (?, ?, ?, TRUE, FALSE, FALSE)";
                     try (PreparedStatement accountStatement = connection.prepareStatement(insertAccount)) {
                         accountStatement.setString(1, email);
@@ -941,9 +941,9 @@ public final class DatabaseMethods {
                     }
                 }
             }
-    
+        
             connection.commit();
-    
+        
         } catch (SQLException e) {
             connection.rollback();
             e.printStackTrace();
@@ -951,6 +951,7 @@ public final class DatabaseMethods {
         } finally {
             connection.setAutoCommit(true);
         }
+    
     }
 
     public void addOrder(Connection connection, Order order) throws SQLException{
