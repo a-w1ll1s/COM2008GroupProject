@@ -71,7 +71,7 @@ class DashboardPanel extends JPanel {
     }
 
     public void switchToOrderHistoryView() {
-        switchToPanelView(new OrderHistoryPanel(parentFrame, account));
+        switchToPanelView(new OrderHistoryPanel(customerView, account));
     }
 
     public void switchToAccountSettingsView() {
