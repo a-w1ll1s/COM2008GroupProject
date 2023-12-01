@@ -43,7 +43,6 @@ class OrderPanel extends JPanel {
         this.customerView = customerView;
         this.customer = customer;
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-        setBackground(Color.GREEN);
 
         // Try get existing bank details
         updateBankDetails();
@@ -56,18 +55,6 @@ class OrderPanel extends JPanel {
         contentsPanel = new JPanel();
         contentsPanel.setLayout(new GridBagLayout());
         displayOrderContents();
-        
-        
-
-        /*
-        GridBagConstraints contentsPanelConstraints = ViewHelpers.getGridBagConstraints(0, row);
-        contentsPanelConstraints.fill = GridBagConstraints.BOTH;
-        contentsPanelConstraints.weightx = 1;
-        contentsPanelConstraints.weighty = 1;
-        contentsPanelConstraints.gridwidth = 2;
-        */
-
-        add(new JScrollPane(contentsPanel));
     }
     private void updateBankDetails() { 
         DatabaseConnection databaseConnection = new DatabaseConnection();
@@ -218,6 +205,8 @@ class OrderPanel extends JPanel {
         contentsPanel.revalidate();
         contentsPanel.repaint();
         contentsPanel.setVisible(true);
+
+        add(new JScrollPane(contentsPanel));
     }
 
     public void removeFromOrder(OrderLine orderLine) {
@@ -247,7 +236,8 @@ class OrderPanel extends JPanel {
 
         order.setOrderLines(newLines);
         customerView.setOrder(order);
-        displayOrderContents();
+        
         displayOrderDetails();
+        displayOrderContents();
     }
 }

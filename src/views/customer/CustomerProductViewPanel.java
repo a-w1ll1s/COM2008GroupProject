@@ -226,6 +226,9 @@ public class CustomerProductViewPanel extends JPanel {
         if (quantitySpinner == null)
             return;
 
+        if (customerView.getOrder() == null)
+            return;
+
         OrderLine line = customerView.getOrder().getOrderLine(productViewPanel.getSelectedProductID());
         if (line == null) {
             quantitySpinner.setValue(0);

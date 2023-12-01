@@ -21,7 +21,6 @@ public class ConfirmOrderPanel extends JPanel {
         this.customer = customer;
         this.order = order;
         setLayout(new GridBagLayout());
-        setBackground(Color.BLUE);
 
         layoutComponents();
     }
