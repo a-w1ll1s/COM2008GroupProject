@@ -35,11 +35,13 @@ public class OrderHistoryPanel extends JPanel {
         orderPanelConstraints.fill = GridBagConstraints.HORIZONTAL;
         orderPanelConstraints.weightx = 1;
 
+        /* 
         for (Order order : orderHistory) {
-            OrderPanel orderPanel = new OrderPanel(order);
+            OrderPanel orderPanel = new OrderPanel(order, account);
             add(orderPanel, orderPanelConstraints);
             orderPanelConstraints.gridy++;
         }
+        */
 
         //JTable table = new JTable(data, columnNames);
         

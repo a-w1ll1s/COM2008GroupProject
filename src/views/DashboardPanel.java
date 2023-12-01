@@ -5,10 +5,12 @@ import java.awt.*;
 import javax.swing.*;
 
 import models.business.Account;
+import models.business.Customer;
 import views.Manager.ManagerView;
 import views.Staff.StaffView;
 import views.customer.ProductViewPanel;
 import views.customer.AccountSettingsPanel;
+import views.customer.CustomerView;
 import views.customer.OrderHistoryPanel;
 
 // Parent panel for the dashboard for customers, staff and managers
@@ -16,6 +18,7 @@ class DashboardPanel extends JPanel {
     private MainFrame parentFrame;
     private Account account;
     private JPanel containerPanel;
+    private CustomerView customerView;
 
     public DashboardPanel(MainFrame frame, Account account) {        
         parentFrame = frame;
@@ -38,9 +41,17 @@ class DashboardPanel extends JPanel {
         containerPanelConstraints.gridy = 1;
         add(containerPanel);
         
-        // TEMP: Testing
-        switchToProductsView();
-        
+        // Start on customer panel
+        Customer customer = new Customer(account.getUserID(), 
+            account.getEmail(),
+            account.getPassword(),
+            account.isCustomer(),
+            account.isStaff(),
+            account.isManager(),
+            account.getHolder());
+        customerView = new CustomerView(frame, customer);
+
+        switchToCustomerView();
     }
 
     private void switchToPanelView(JPanel panel) { 
@@ -51,11 +62,14 @@ class DashboardPanel extends JPanel {
         constraints.fill = GridBagConstraints.BOTH;
         containerPanel.add(panel, constraints);
 
-        redraw();
+        containerPanel.revalidate();
+        containerPanel.repaint();
+        containerPanel.setVisible(true);
     }
 
-    public void switchToProductsView() {
-        switchToPanelView(new ProductViewPanel(parentFrame, false));
+    public void switchToCustomerView() {
+        customerView.switchToProductsView();
+        switchToPanelView(customerView);
     }
 
     public void switchToOrderHistoryView() {
@@ -73,11 +87,5 @@ class DashboardPanel extends JPanel {
 
     public void switchToManagerView() {
         switchToPanelView(new ManagerView(parentFrame));
-    }
-
-    private void redraw() {        
-        containerPanel.revalidate();
-        containerPanel.repaint();
-        containerPanel.setVisible(true);        
     }
 }

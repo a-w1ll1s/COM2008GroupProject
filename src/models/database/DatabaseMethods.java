@@ -2,11 +2,13 @@ package models.database;
 import models.business.*;
 
 import java.sql.Statement;
+import java.text.SimpleDateFormat;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Calendar;
 
 /**
  * DatabaseMethods handles the interactions with the database.
@@ -658,6 +660,17 @@ public final class DatabaseMethods {
 
         }
     }
+    public static void deleteOrderLine(Connection connection, int orderID, int lineID) throws SQLException {
+        String deleteQuery = "DELETE FROM `Order Line` WHERE lineID = ? AND orderID = ?";
+        try (PreparedStatement statement = connection.prepareStatement(deleteQuery)) {
+            statement.setInt(1, lineID);
+            statement.setInt(2, orderID);
+            statement.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw e;
+        }
+    }
     public static void addProduct(Connection connection, int productID, String productCode, String manufacturer, String name, int price, String gauge) throws SQLException {
         String insertStatement = "INSERT INTO Product (productID, productCode, manufacturer, name, price, gauge) VALUES (?, ?, ?, ?, ?, ?)";
         try (PreparedStatement preparedStatement = connection.prepareStatement(insertStatement)) {
@@ -954,19 +967,31 @@ public final class DatabaseMethods {
     
     }
 
-    public void addOrder(Connection connection, Order order) throws SQLException{
+    public static Order createNewOrGetPendingOrder(Connection connection, int accountID) throws SQLException {
+        ArrayList<Order> pendingOrders = getPendingCustomerOrders(connection, accountID);
+    
+        if (pendingOrders.size() != 0) {
+            return pendingOrders.get(0);
+        }
+
+        // Couldn't find a pending order to continue, so create a new order
+        int dateAsInt = Integer.parseInt(
+            new SimpleDateFormat("ddMMyyyy").format(Calendar.getInstance().getTime()));
 
         try {
+            String insertStatement = "INSERT INTO `Order` (`userID`, `date`, `status`) VALUES (?, ?, ?)";
+            PreparedStatement preparedStatement = connection.prepareStatement(insertStatement, 
+                Statement.RETURN_GENERATED_KEYS);
 
-            String insertStatement = "INSERT INTO Order (orderID, userID, date, status) VALUES (?, ?, ?, ?)";
-            PreparedStatement preparedStatement = connection.prepareStatement(insertStatement);
-
-            preparedStatement.setInt(1, order.getOrderID());
-            preparedStatement.setInt(2, order.getUserID());
-            preparedStatement.setInt(3, order.getDate());
-            preparedStatement.setString(4, order.getStatus());
+            preparedStatement.setInt(1, accountID);
+            preparedStatement.setInt(2, dateAsInt);
+            preparedStatement.setString(3, "Pending");
 
             preparedStatement.executeUpdate();
+            ResultSet rs = preparedStatement.getGeneratedKeys();
+            rs.next();
+
+            return new Order(rs.getInt(1), accountID, dateAsInt, "Pending");
            
         } catch (SQLException e) {
             e.printStackTrace();
@@ -975,25 +1000,87 @@ public final class DatabaseMethods {
 
     }
 
-    public void addOrderLine(Connection connection, int orderID, OrderLine orderLine) throws SQLException{
+    public static OrderLine createOrUpdateOrderLine(Connection connection, int orderID, Product product, 
+        int newQuantity) 
+        throws SQLException {
+
+        ArrayList<OrderLine> orderLines = getOrderLinesForOrder(connection, orderID);
+        int lineID = -1;
+        for (int i = 0; i < orderLines.size(); ++i) {
+            if (orderLines.get(i).getProduct().getProductID() == product.getProductID()) {
+                lineID = i;
+                break;
+            }
+        }
 
         try {
+            // If we didn't find an existing order line
+            if (lineID == -1) {
+                
+                lineID = orderLines.size();
+                System.out.println("new lineID + " + lineID);
 
-            String insertStatement = "INSERT INTO `Order Line` (orderID, lineID, productID, quantity) VALUES (?, ?, ?, ?)";
-            PreparedStatement preparedStatement = connection.prepareStatement(insertStatement);
+                String insertStatement = "INSERT INTO `Order Line` (lineID, orderID, productID, quantity) "
+                + "VALUES (?, ?, ?, 1)";
+                    
+                PreparedStatement preparedInsertStatement = connection.prepareStatement(insertStatement);
+                
+                preparedInsertStatement.setInt(1, lineID);
+                preparedInsertStatement.setInt(2, orderID);
+                preparedInsertStatement.setInt(3, product.getProductID());
 
-            preparedStatement.setInt(1, orderID);
+                preparedInsertStatement.executeUpdate();
+
+                return new OrderLine(lineID, product, 1);
+            }
+            else {
+                String updateStatement = "UPDATE `Order Line` SET quantity = ? "
+                    + "WHERE orderID = ? AND lineID = ? AND productID = ?";
+                    
+                PreparedStatement preparedUpdateStatement = connection.prepareStatement(updateStatement);
+
+                preparedUpdateStatement.setInt(1, newQuantity);
+                preparedUpdateStatement.setInt(2, orderID);
+                preparedUpdateStatement.setInt(3, lineID);
+                preparedUpdateStatement.setInt(4, product.getProductID());
+
+                preparedUpdateStatement.executeUpdate();
+
+                return new OrderLine(lineID, product, newQuantity);
+            }            
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw e;
+        }
+    }
+    public static Boolean updateOrderLine(Connection connection, int orderID, OrderLine orderLine) 
+        throws SQLException {
+
+        try {
+            String insertStatement = "UPDATE `Order Line` SET quantity = ? "
+                + "WHERE lineID = ? AND orderID = ? AND productID = ?";
+                    
+            PreparedStatement preparedStatement = connection.prepareStatement(insertStatement, 
+                Statement.RETURN_GENERATED_KEYS);
+
+            
+            preparedStatement.setInt(1, orderLine.getQuantity());
             preparedStatement.setInt(2, orderLine.getLineNum());
-            preparedStatement.setInt(3, orderLine.getProduct().getProductID());
-            preparedStatement.setInt(4, orderLine.getQuantity());
+            preparedStatement.setInt(3, orderID);
+            preparedStatement.setInt(4, orderLine.getProduct().getProductID());
 
             preparedStatement.executeUpdate();
+
+            ResultSet rs = preparedStatement.getGeneratedKeys();
+            rs.next();
+
+            orderLine.setQuantity(orderID);
+            return true;
            
         } catch (SQLException e) {
             e.printStackTrace();
             throw e;
         }
-
     }
 
     public HolderAddress getCurrentAddress(Connection connection, int holderID) throws SQLException {

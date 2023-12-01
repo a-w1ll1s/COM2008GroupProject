@@ -4,22 +4,20 @@ import java.awt.*;
 import java.util.ArrayList;
 
 import javax.swing.*;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 
-import models.business.Account;
+import models.business.Order;
+import models.business.OrderLine;
+import models.business.Product;
 import views.CustomStyleConstants;
-import views.MainFrame;
+import views.Staff.StaffProductViewPanel;
 
 public class ProductViewPanel extends JPanel {
-    private MainFrame parentFrame;
-    private JPanel mainPanel, optionsPanel;
+    private JPanel mainPanel, optionsPanel, parentPanel;
     private ExpandableCategoryPanel selectedCategory;
     private ArrayList<JButton> categoryButtons = new ArrayList<>();
-    private JSpinner quantitySpinner;
 
-    public ProductViewPanel(MainFrame frame, Boolean isStaffView) {        
-        parentFrame = frame;
+    public ProductViewPanel(JPanel parentPanel) {
+        this.parentPanel = parentPanel;
         setLayout(new GridBagLayout());
 
         mainPanel = new JPanel();
@@ -49,8 +47,7 @@ public class ProductViewPanel extends JPanel {
         }
 
         GridBagConstraints buttonsPanelConstraints = new GridBagConstraints();
-        buttonsPanelConstraints.fill = GridBagConstraints.BOTH;
-        buttonsPanelConstraints.weightx = 0.15;
+        buttonsPanelConstraints.fill = GridBagConstraints.VERTICAL;
         buttonsPanelConstraints.weighty = 1;
         
         mainPanel.add(categoryButtonsPanel, buttonsPanelConstraints);
@@ -60,23 +57,9 @@ public class ProductViewPanel extends JPanel {
         mainPanelConstraints.weightx = 1;
         mainPanelConstraints.weighty = 1;
 
-        // Options panel
-        optionsPanel = new JPanel();
-        optionsPanel.setLayout(new GridBagLayout());
-        GridBagConstraints optionsPanelConstraints = new GridBagConstraints();
-        optionsPanelConstraints.fill = GridBagConstraints.BOTH;
-        optionsPanelConstraints.weightx = 1;
-        optionsPanelConstraints.gridy = 1;
-
-        if (isStaffView) {
-            addStaffOptions();
-        }
-        else {
-            addCustomerOptions();
-        }
+        
         
         add(mainPanel, mainPanelConstraints);
-        add(optionsPanel, optionsPanelConstraints);
 
         // Selected category products panel
         showSelectedButton(categoryButtons.get(0));
@@ -96,62 +79,12 @@ public class ProductViewPanel extends JPanel {
         }
     }
 
-    private void addStaffOptions() {
-        GridBagConstraints optionButtonConstraints = new GridBagConstraints();
-        optionButtonConstraints.insets = new Insets(5, 5, 5, 5);
-
-        JButton addProductButton = new JButton("Add product");
-        JButton deleteProductButton = new JButton("Delete product");
-
-        optionsPanel.add(addProductButton, optionButtonConstraints);
-        optionsPanel.add(deleteProductButton, optionButtonConstraints);
-        //optionsPanel.add(quantityLabel, optionButtonConstraints);
-        //optionsPanel.add(quantitySpinner);
-
+    public int getSelectedProductID() {
+        return selectedCategory.getSelectedProductID();
     }
-
-    private void addCustomerOptions() {
-        GridBagConstraints optionButtonConstraints = new GridBagConstraints();
-        optionButtonConstraints.insets = new Insets(5, 5, 5, 5);
-
-        JButton confirmOrderButton = new JButton("Confirm order");
-        confirmOrderButton.addActionListener(e -> {
-                        
-        });
-
-        JButton addToOrderButton = new JButton("Add to order");
-        addToOrderButton.addActionListener(e -> {
-            if (selectedCategory.getSelectedProductID() == -1) {
-                JOptionPane.showMessageDialog(parentFrame, "Please select a product!");
-                return;
-            }
-            System.out.println(selectedCategory.getSelectedProductID());            
-        });
-
-        JButton removeFromOrderButton = new JButton("Remove from order");
-
-        JLabel quantityLabel = new JLabel("Order Quantity: ");
-        quantitySpinner = new JSpinner(new SpinnerNumberModel(0, 0, 100, 1));
-
-        quantitySpinner.addChangeListener(new ChangeListener() {
-            @Override
-            public void stateChanged(ChangeEvent e) {
-                JSpinner s = (JSpinner) e.getSource();
-                System.out.println(s.getValue().toString());
-            }
-        });
-
-        optionsPanel.add(addToOrderButton, optionButtonConstraints);
-        optionsPanel.add(removeFromOrderButton, optionButtonConstraints);
-        optionsPanel.add(quantityLabel, optionButtonConstraints);
-        optionsPanel.add(quantitySpinner);
+    public Product getSelectedProduct() {
+        return selectedCategory.getSelectedProduct();
     }
-
-    public void onSelectedProductChanged() {
-        // TODO: Set the quantity to the current quantity of the product in the order
-        //quantitySpinner.setValue();
-    }
-
 
     private void selectCategory(String category) {
         // Check we're not already on the category
@@ -178,5 +111,14 @@ public class ProductViewPanel extends JPanel {
         revalidate();
         repaint();
         setVisible(true);        
+    }
+
+    public void onSelectedProductChanged() {
+        if (parentPanel instanceof CustomerProductViewPanel) {
+            ((CustomerProductViewPanel)parentPanel).onSelectedProductChanged();
+        }
+        else if (parentPanel instanceof StaffProductViewPanel) {
+            ((StaffProductViewPanel)parentPanel).onSelectedProductChanged();
+        }
     }
 }

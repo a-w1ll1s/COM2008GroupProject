@@ -10,6 +10,7 @@ import javax.swing.table.DefaultTableModel;
 import models.business.Account;
 import models.business.Controller;
 import models.business.Locomotive;
+import models.business.Order;
 import models.business.Product;
 import models.business.RollingStock;
 import models.business.Track;
@@ -26,7 +27,7 @@ class ExpandableCategoryPanel extends JPanel {
     private Account account;
     private JPanel productContainerPanel;
     private String category;
-    private int selectedProductID = -1;
+    private Product selectedProduct;
     
     public ExpandableCategoryPanel(ProductViewPanel parentPanel, Account account, String category) {       
         this.parentPanel = parentPanel;
@@ -126,20 +127,28 @@ class ExpandableCategoryPanel extends JPanel {
     }
 
     public int getSelectedProductID() {
-        return selectedProductID;
+        if (selectedProduct == null)
+            return -1;
+            
+        return selectedProduct.getProductID();
+    }
+
+    public Product getSelectedProduct() {
+        return selectedProduct;
     }
 
     public void showSelectedProduct(int productID) {
-        if (productID == selectedProductID)
+        if (productID == getSelectedProductID())
             return;
 
         Color defaultColour = new JPanel().getBackground();
         for (Component comp : productContainerPanel.getComponents()) {
             if (comp instanceof ProductPanel) {
                 ProductPanel panel = (ProductPanel)comp;
-                if (panel.getProductID() == productID) {
+                Product product = panel.getProduct();
+                if (product.getProductID() == productID) {
                     panel.setBackground(CustomStyleConstants.SELECTED_PRODUCT_COLOUR);
-                    selectedProductID = productID;
+                    selectedProduct = product;
 
                     // Get the parent to process anything that needs to be shown when we select a product
                     parentPanel.onSelectedProductChanged();
