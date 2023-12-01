@@ -147,8 +147,7 @@ public class AccountSettingsPanel extends JPanel {
             // Call update methods
             databaseMethods.updateAccountHolderDetails(connection, holder, newAddress);
             databaseMethods.updateAddressDetails(connection, newAddress, oldHouseNum, oldPostcode);
-
-            
+            databaseMethods.updateAccountDetails(connection, account);            
 
             // Commit transaction
             connection.commit();
