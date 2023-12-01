@@ -6,7 +6,9 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 
 import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
 
+import helpers.ViewHelpers;
 import models.business.Account;
 import models.business.Controller;
 import models.business.Locomotive;
@@ -17,34 +19,23 @@ import models.business.RollingStock;
 import models.business.Track;
 import models.database.DatabaseConnection;
 import models.database.DatabaseMethods;
+import views.Staff.OrderTableModel;
+import views.CustomStyleConstants;
 import views.MainFrame;
 
 public class OrderHistoryPanel extends JPanel {
-    private MainFrame parentFrame;
+    private CustomerView customerView;
     private ArrayList<Order> orderHistory = new ArrayList<>();
     private Account account;
+    private JPanel contentsPanel;
     
-    public OrderHistoryPanel(MainFrame frame, Account account) {        
-        parentFrame = frame;
+    public OrderHistoryPanel(CustomerView customerView, Account account) {  
+        this.customerView = customerView;      
         this.account = account;
-        setLayout(new GridBagLayout());
 
         updateOrderHistory();
 
-        GridBagConstraints orderPanelConstraints = new GridBagConstraints();
-        orderPanelConstraints.fill = GridBagConstraints.HORIZONTAL;
-        orderPanelConstraints.weightx = 1;
-
-        /* 
-        for (Order order : orderHistory) {
-            OrderPanel orderPanel = new OrderPanel(order, account);
-            add(orderPanel, orderPanelConstraints);
-            orderPanelConstraints.gridy++;
-        }
-        */
-
-        //JTable table = new JTable(data, columnNames);
-        
+        add(new JScrollPane(getOrderTable()));
     }
 
     private void updateOrderHistory() {
@@ -71,6 +62,22 @@ public class OrderHistoryPanel extends JPanel {
             databaseConnection.closeConnection();
         }
 
-
     }
+
+    private JTable getOrderTable() {
+
+        DefaultTableModel model = new DefaultTableModel();
+
+        for (Order order : orderHistory) {
+            model.addRow(new Object[]{order.toString()}); 
+            for (OrderLine line : order.getOrderLines()) {
+                model.addRow(new Object[]{line.toString()});
+            }
+        }
+
+        JTable orders = new JTable(model);
+
+        return orders;
+    }
+
 }

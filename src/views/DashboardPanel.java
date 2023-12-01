@@ -8,6 +8,8 @@ import models.business.Account;
 import models.business.Customer;
 import views.Manager.ManagerView;
 import views.Staff.StaffView;
+import views.customer.ProductViewPanel;
+import views.customer.AccountSettingsPanel;
 import views.customer.CustomerView;
 import views.customer.OrderHistoryPanel;
 
@@ -71,12 +73,11 @@ class DashboardPanel extends JPanel {
     }
 
     public void switchToOrderHistoryView() {
-        switchToPanelView(new OrderHistoryPanel(parentFrame, account));
+        switchToPanelView(new OrderHistoryPanel(customerView, account));
     }
 
     public void switchToAccountSettingsView() {
-        // TODO: Implement account settings panel
-        switchToPanelView(new JPanel());
+        switchToPanelView(new AccountSettingsPanel(parentFrame, account));
     }
 
 
