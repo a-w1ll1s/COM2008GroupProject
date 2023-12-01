@@ -1103,41 +1103,90 @@ public final class DatabaseMethods {
         return null;
     }
     
-
-    public void updateAccountDetails(Connection connection, Account account) throws SQLException {
-        String updateQuery = "UPDATE Account SET email = ? WHERE userID = ?";
-        try (PreparedStatement statement = connection.prepareStatement(updateQuery)) {
-            statement.setString(1, account.getEmail());
-            statement.setInt(2, account.getUserID());
-            statement.executeUpdate();
+    public boolean canDeleteAddress(Connection connection, String oldHouseNum, String oldPostcode) throws SQLException {
+        String query = "SELECT COUNT(*) FROM AccountHolder WHERE houseNum = ? AND postcode = ?";
+        try (PreparedStatement statement = connection.prepareStatement(query)) {
+            statement.setString(1, oldHouseNum);
+            statement.setString(2, oldPostcode);
+    
+            ResultSet resultSet = statement.executeQuery();
+            if (resultSet.next()) {
+                int count = resultSet.getInt(1);
+                System.out.println(count);
+                return count == 0; // Return true if no AccountHolder references this address
+            }
+            return false;
         }
     }
 
-    public void updateAccountHolderDetails(Connection connection, AccountHolder holder, HolderAddress newAddress) throws SQLException {
-        String updateQuery = "UPDATE AccountHolder SET forename = ?, surname = ?, houseNum = ?, postcode = ? WHERE holderID = ?";
-        try (PreparedStatement statement = connection.prepareStatement(updateQuery)) {
-            statement.setString(1, holder.getForename());
-            statement.setString(2, holder.getSurname());
-            statement.setString(3, newAddress.getHouseNum());
-            statement.setString(4, newAddress.getPostcode());
-            statement.setInt(5, holder.getHolderID());
-            statement.executeUpdate();
+
+    public void updateAccountAndAddressDetails(Connection connection, Account account, AccountHolder holder, HolderAddress newAddress, String oldHouseNum, String oldPostcode) throws SQLException {
+        // Start transaction
+        connection.setAutoCommit(false);
+    
+        try {
+            // Update Account Details
+            String updateAccountQuery = "UPDATE Account SET email = ? WHERE userID = ?";
+            try (PreparedStatement accountStatement = connection.prepareStatement(updateAccountQuery)) {
+                accountStatement.setString(1, account.getEmail());
+                accountStatement.setInt(2, account.getUserID());
+                accountStatement.executeUpdate();
+            }
+            // Update HolderAddress first
+            String insertQuery = "INSERT INTO HolderAddress (houseNum, roadName, cityName, postcode) VALUES (?, ?, ?, ?)";
+            System.out.println(newAddress.getHouseNum());
+            System.out.println(newAddress.getPostcode());
+            try (PreparedStatement statement = connection.prepareStatement(insertQuery)) {
+                statement.setString(1, newAddress.getHouseNum());
+                statement.setString(2, newAddress.getRoadName());
+                statement.setString(3, newAddress.getCityName());
+                statement.setString(4, newAddress.getPostcode());
+        
+                statement.executeUpdate();
+            }
+    
+            // Then update AccountHolder
+            String updateHolderQuery = "UPDATE AccountHolder SET forename = ?, surname = ?, houseNum = ?, postcode = ? WHERE houseNum = ? AND postcode = ?";
+            System.out.println(newAddress.getHouseNum());
+            System.out.println(newAddress.getPostcode());
+            System.out.println(oldHouseNum);
+            System.out.println(oldPostcode);
+            try (PreparedStatement holderStatement = connection.prepareStatement(updateHolderQuery)) {
+                holderStatement.setString(1, holder.getForename());
+                holderStatement.setString(2, holder.getSurname());
+                holderStatement.setString(3, newAddress.getHouseNum());
+                holderStatement.setString(4, newAddress.getPostcode());
+                holderStatement.setString(5, oldHouseNum);
+                holderStatement.setString(6, oldPostcode);
+                holderStatement.executeUpdate();
+            }
+
+            if (canDeleteAddress(connection, oldHouseNum, oldPostcode)) {
+                String deleteQuery = "DELETE FROM HolderAddress WHERE houseNum = ? AND postcode = ?";
+                try (PreparedStatement statement = connection.prepareStatement(deleteQuery)) {
+                    statement.setString(1, oldHouseNum);
+                    statement.setString(2, oldPostcode);
+                    statement.executeUpdate();
+                }
+            } else {
+                // Handle the case where the address is still referenced
+                // For example, log a message or throw an exception
+                System.out.println("Cannot delete address as it is still referenced by an AccountHolder.");
+            }
+        
+    
+            // Commit transaction
+            connection.commit();
+        } catch (SQLException e) {
+            // Rollback in case of error
+            connection.rollback();
+            throw e;
+        } finally {
+            // Reset auto-commit to default
+            connection.setAutoCommit(true);
         }
     }
     
-    
-    public void updateAddressDetails(Connection connection, HolderAddress newAddress, String oldHouseNum, String oldPostcode) throws SQLException {
-        String updateQuery = "UPDATE HolderAddress SET houseNum = ?, roadName = ?, cityName = ?, postcode = ? WHERE houseNum = ? AND postcode = ?";
-        try (PreparedStatement statement = connection.prepareStatement(updateQuery)) {
-            statement.setString(1, newAddress.getHouseNum());
-            statement.setString(2, newAddress.getRoadName());
-            statement.setString(3, newAddress.getCityName());
-            statement.setString(4, newAddress.getPostcode());
-            statement.setString(5, oldHouseNum);
-            statement.setString(6, oldPostcode);
-            statement.executeUpdate();
-        }
-    }
     
     
 
