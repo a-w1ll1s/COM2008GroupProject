@@ -801,8 +801,8 @@ public final class DatabaseMethods {
         }
     }
 
-    public static BankDetails createOrUpdateBankDetails(Connection connection, int cardNum, 
-        int newSortCode, String cardBrand, String newBankName, int userID) throws SQLException {
+    public static void createOrUpdateBankDetails(Connection connection, String cardBrand, 
+        int cardNum, int cardExpiry, int securityCode, int userID) throws SQLException {
 
         String selectStatement = "SELECT * FROM BankDetails WHERE userID = ?";
         try (PreparedStatement preparedStatement = connection.prepareStatement(selectStatement)) {
@@ -811,25 +811,29 @@ public final class DatabaseMethods {
             ResultSet rs = preparedStatement.executeQuery();
 
             if (rs.next()) {
-                String updateStatement = "UPDATE BankDetails SET sortCode = ?, bankName = ?, cardNum = ?, cardBrand = ? WHERE holderID = ?";
-                try (PreparedStatement preparedUpdateStatement = connection.prepareStatement(updateStatement)) {
-                    preparedUpdateStatement.setInt(1, newSortCode);
-                    preparedUpdateStatement.setString(2, newBankName);
-                    preparedUpdateStatement.setInt(3, cardNum);
-                    preparedUpdateStatement.setString(4, cardBrand);
-                    preparedUpdateStatement.setInt(5, userID);
-        
-                    preparedUpdateStatement.executeUpdate();
-
-                    //return new BankDetails(cardBrand, cardNum, cardExpiry, securityCode);
-
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                    throw e;
-                }
+                String updateStatement = "UPDATE BankDetails SET cardBrand = ?, cardNum = ?, cardExpiry = ?, "
+                    + "securityCode = ? WHERE userID = ?";
+                PreparedStatement preparedUpdateStatement = connection.prepareStatement(updateStatement);
+                preparedUpdateStatement.setString(1,cardBrand);
+                preparedUpdateStatement.setInt(2, cardNum);
+                preparedUpdateStatement.setInt(3, cardExpiry);
+                preparedUpdateStatement.setInt(4, securityCode);
+                preparedUpdateStatement.setInt(5, userID);
+    
+                preparedUpdateStatement.executeUpdate();
             }
             else {
-
+                String insertStatement = "INSERT INTO BankDetails "
+                    + "(cardBrand, cardNum, cardExpiry, securityCode, userID) VALUES (?, ?, ?, ?, ?)";
+                    
+                PreparedStatement preparedUpdateStatement = connection.prepareStatement(insertStatement);
+                preparedUpdateStatement.setString(1,cardBrand);
+                preparedUpdateStatement.setInt(2, cardNum);
+                preparedUpdateStatement.setInt(3, cardExpiry);
+                preparedUpdateStatement.setInt(4, securityCode);
+                preparedUpdateStatement.setInt(5, userID);
+    
+                preparedUpdateStatement.executeUpdate();
             }
 
         } catch (SQLException e) {

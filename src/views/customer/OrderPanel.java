@@ -278,51 +278,51 @@ class OrderPanel extends JPanel {
     }
 
     private void tryPurchase() {
-        if (bankBrandTextField.getText().isBlank()) {
+        String cardBrand = bankBrandTextField.getText();
+        String cardNum = bankCardNumberTextField.getText();
+        String cardExpiry = bankExpiryTextField.getText();
+        String securityCode = bankSecurityCodeTextField.getText();
+
+        if (cardBrand.isBlank()) {
             JOptionPane.showMessageDialog(this, "You must set a bank brand!");
             return;
         }
 
-        if (bankCardNumberTextField.getText().isBlank()) {
+        if (cardNum.isBlank()) {
             JOptionPane.showMessageDialog(this, "You must set a bank card number!");
             return;
         }
 
-        if (bankExpiryTextField.getText().isBlank()) {
+        if (cardExpiry.isBlank()) {
             JOptionPane.showMessageDialog(this, "You must set a bank expiry date!");
             return;
         }
 
-        if (bankSecurityCodeTextField.getText().isBlank()) {
+        if (securityCode.isBlank()) {
             JOptionPane.showMessageDialog(this, "You must set a bank security code!");
             return;
         }
 
-        // We were given valid bank details so update
-        /* 
         DatabaseConnection databaseConnection = new DatabaseConnection();
         try {
             databaseConnection.openConnection();
-            BankDetails bankDetails = DatabaseMethods.editBankDetails(databaseConnection.getConnection(), 
+
+            // We were given valid bank details so update
+            DatabaseMethods.createOrUpdateBankDetails(databaseConnection.getConnection(), 
+                cardBrand,
+                Integer.parseInt(cardNum),
+                Integer.parseInt(cardExpiry),
+                Integer.parseInt(securityCode),
                 customer.getUserID());
 
-            if (bankDetails != null) {
-                customer.addBankDetails(bankDetails);
-            }
-        } 
-        catch (SQLException ex) {
-            JOptionPane.showMessageDialog(this, "Error getting bank details " + ex.getMessage());
-            return;
-        } 
-        finally {
-            databaseConnection.closeConnection();
-        }
-        */
+            BankDetails details = new BankDetails(cardBrand, 
+                Integer.parseInt(cardNum), 
+                Integer.parseInt(cardExpiry), 
+                Integer.parseInt(securityCode));
 
-        // COnfirm the order
-        DatabaseConnection databaseConnection = new DatabaseConnection();
-        try {
-            databaseConnection.openConnection();
+            customer.addBankDetails(details);
+
+            // Confirm the order
             DatabaseMethods.updateOrderStatus(databaseConnection.getConnection(), 
                 customerView.getOrder().getOrderID(),
                 "Confirmed");
@@ -335,7 +335,9 @@ class OrderPanel extends JPanel {
             databaseConnection.closeConnection();
         }
 
-        // Display success
+        // Display
         JOptionPane.showMessageDialog(this, "Your order has been confirmed, thank you!");
+        customerView.setOrder(null);
+        customerView.switchToProductsView();
     }
 }
