@@ -41,10 +41,6 @@ public class Order {
         addOrderLine(orderLine);
     }
 
-    public void deleteOrderLine(OrderLine orderLine) {
-        orderLines.remove(orderLine.getLineNum());
-    }
-
     //Getters
     public int getOrderID() {
         return orderID;

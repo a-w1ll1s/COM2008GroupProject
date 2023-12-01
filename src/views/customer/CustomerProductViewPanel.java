@@ -87,7 +87,35 @@ public class CustomerProductViewPanel extends JPanel {
                 return;
             }
 
-            // TODO: ACTUALLY REMOVE FROM ORDER
+            Order order = customerView.getOrder();
+            OrderLine orderLine = order.getOrderLine(productViewPanel.getSelectedProductID());
+
+            DatabaseConnection databaseConnection = new DatabaseConnection();
+            try {
+                databaseConnection.openConnection();
+                DatabaseMethods.deleteOrderLine(databaseConnection.getConnection(), 
+                    order.getOrderID(),
+                    orderLine.getLineNum());
+            } 
+            catch (SQLException ex) {
+                JOptionPane.showMessageDialog(this, "Error deleting order line " + ex.getMessage());
+                return;
+            } 
+            finally {
+                databaseConnection.closeConnection();
+            }
+
+            ArrayList<OrderLine> newLines = new ArrayList<>();
+            for (OrderLine line : order.getOrderLines()) {
+                if (line.getLineNum() != orderLine.getLineNum()) {
+                    newLines.add(line);
+                }
+            }
+            order.setOrderLines(newLines);
+            customerView.setOrder(order);
+
+            // Must redraw spinner so it does not fire the value changed
+            setupOptionsPanel();
         });
 
         JLabel quantityLabel = new JLabel("Order Quantity: ");
@@ -126,11 +154,13 @@ public class CustomerProductViewPanel extends JPanel {
         optionsPanel.add(quantityLabel, optionButtonConstraints);
         optionsPanel.add(quantitySpinner);
 
+        add(optionsPanel, optionsPanelConstraints);
+
         optionsPanel.revalidate();
         optionsPanel.repaint();
         optionsPanel.setVisible(true);
 
-        add(optionsPanel, optionsPanelConstraints);
+        
     }
     
     private void addSelectedProductToOrder() {

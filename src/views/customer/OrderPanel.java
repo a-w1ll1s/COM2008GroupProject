@@ -219,6 +219,7 @@ class OrderPanel extends JPanel {
         }
         System.out.println(order.getOrderLines().size() - newLines.size());
         order.setOrderLines(newLines);
+        customerView.setOrder(order);
         displayOrderContents();
     }
 }
