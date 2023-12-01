@@ -10,6 +10,8 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Calendar;
 
+import javax.naming.spi.DirStateFactory.Result;
+
 /**
  * DatabaseMethods handles the interactions with the database.
  * 
@@ -784,7 +786,7 @@ public final class DatabaseMethods {
         }
     }
 
-    public static void editBankDetails(Connection connection, String accountNumber, String newSortCode, String newBankName, int holderID) throws SQLException {
+    public static void editBankDetails(Connection connection, int cardNum, int newSortCode, String newBankName, int holderID) throws SQLException {
         String updateStatement = "UPDATE BankDetails SET sortCode = ?, bankName = ? WHERE accountNumber = ? AND holderID = ?";
         try (PreparedStatement preparedStatement = connection.prepareStatement(updateStatement)) {
             preparedStatement.setString(1, newSortCode);
@@ -797,6 +799,46 @@ public final class DatabaseMethods {
             e.printStackTrace();
             throw e;
         }
+    }
+
+    public static BankDetails createOrUpdateBankDetails(Connection connection, int cardNum, 
+        int newSortCode, String cardBrand, String newBankName, int userID) throws SQLException {
+
+        String selectStatement = "SELECT * FROM BankDetails WHERE userID = ?";
+        try (PreparedStatement preparedStatement = connection.prepareStatement(selectStatement)) {
+            preparedStatement.setInt(1, userID);
+    
+            ResultSet rs = preparedStatement.executeQuery();
+
+            if (rs.next()) {
+                String updateStatement = "UPDATE BankDetails SET sortCode = ?, bankName = ?, cardNum = ?, cardBrand = ? WHERE holderID = ?";
+                try (PreparedStatement preparedUpdateStatement = connection.prepareStatement(updateStatement)) {
+                    preparedUpdateStatement.setInt(1, newSortCode);
+                    preparedUpdateStatement.setString(2, newBankName);
+                    preparedUpdateStatement.setInt(3, cardNum);
+                    preparedUpdateStatement.setString(4, cardBrand);
+                    preparedUpdateStatement.setInt(5, userID);
+        
+                    preparedUpdateStatement.executeUpdate();
+
+                    //return new BankDetails(cardBrand, cardNum, cardExpiry, securityCode);
+
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                    throw e;
+                }
+            }
+            else {
+
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw e;
+        }
+
+
+        
     }
 
     public static BankDetails getBankDetails(Connection connection, int userID) throws SQLException {
@@ -1000,6 +1042,22 @@ public final class DatabaseMethods {
 
     }
 
+    public static void updateOrderStatus(Connection connection, int orderID, String status) throws SQLException {
+        try {
+            String updateStatement = "UPDATE `Order` SET status = ? where `orderID` = ?";
+            PreparedStatement preparedStatement = connection.prepareStatement(updateStatement);
+
+            preparedStatement.setString(1, status);
+            preparedStatement.setInt(2, orderID);
+
+            preparedStatement.executeUpdate();
+           
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw e;
+        }
+    }
+
     public static OrderLine createOrUpdateOrderLine(Connection connection, int orderID, Product product, 
         int newQuantity) 
         throws SQLException {
@@ -1008,11 +1066,12 @@ public final class DatabaseMethods {
         int lineID = -1;
         int maxLineID = -1;
         for (int i = 0; i < orderLines.size(); ++i) {
+            if (orderLines.get(i).getLineNum() > maxLineID) {
+                maxLineID = orderLines.get(i).getLineNum();
+            }
+
             if (orderLines.get(i).getProduct().getProductID() == product.getProductID()) {
                 lineID = orderLines.get(i).getLineNum();
-                if (lineID > maxLineID) {
-                    maxLineID = lineID;
-                }
                 
                 System.out.println(orderLines.get(i).getProduct().getName());
                 break;
@@ -1024,8 +1083,6 @@ public final class DatabaseMethods {
             if (lineID == -1) {
                 
                 lineID = maxLineID + 1;
-
-
 
                 System.out.println("new lineID + " + lineID);
 

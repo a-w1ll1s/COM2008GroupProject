@@ -81,7 +81,6 @@ public class CustomerProductViewPanel extends JPanel {
             quantitySpinner.revalidate();
             quantitySpinner.repaint();
             quantitySpinner.setVisible(true);
-
         });
 
         JButton removeFromOrderButton = new JButton("Remove from order");
@@ -137,6 +136,13 @@ public class CustomerProductViewPanel extends JPanel {
                     databaseConnection.openConnection();
 
                     Order order = customerView.getOrder();
+                    if (order == null) {
+                        order = DatabaseMethods.createNewOrGetPendingOrder(databaseConnection.getConnection(), 
+                        account.getUserID());
+                        customerView.setOrder(order);
+                    }
+
+                    order = customerView.getOrder();
                     OrderLine orderLine = DatabaseMethods.createOrUpdateOrderLine(databaseConnection.getConnection(),
                         order.getOrderID(),
                         productViewPanel.getSelectedProduct(),

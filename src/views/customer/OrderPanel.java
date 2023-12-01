@@ -46,7 +46,7 @@ class OrderPanel extends JPanel {
         setLayout(new GridBagLayout());
 
         // Try get existing bank details
-        updateBankDetails();
+        getBankDetails();
 
         displayPanel = new JPanel();
         displayPanel.setLayout(new GridBagLayout());
@@ -56,7 +56,7 @@ class OrderPanel extends JPanel {
         contentsPanel.setLayout(new GridBagLayout());
         displayOrderContents();
     }
-    private void updateBankDetails() { 
+    private void getBankDetails() { 
         DatabaseConnection databaseConnection = new DatabaseConnection();
         try {
             databaseConnection.openConnection();
@@ -297,5 +297,45 @@ class OrderPanel extends JPanel {
             JOptionPane.showMessageDialog(this, "You must set a bank security code!");
             return;
         }
+
+        // We were given valid bank details so update
+        /* 
+        DatabaseConnection databaseConnection = new DatabaseConnection();
+        try {
+            databaseConnection.openConnection();
+            BankDetails bankDetails = DatabaseMethods.editBankDetails(databaseConnection.getConnection(), 
+                customer.getUserID());
+
+            if (bankDetails != null) {
+                customer.addBankDetails(bankDetails);
+            }
+        } 
+        catch (SQLException ex) {
+            JOptionPane.showMessageDialog(this, "Error getting bank details " + ex.getMessage());
+            return;
+        } 
+        finally {
+            databaseConnection.closeConnection();
+        }
+        */
+
+        // COnfirm the order
+        DatabaseConnection databaseConnection = new DatabaseConnection();
+        try {
+            databaseConnection.openConnection();
+            DatabaseMethods.updateOrderStatus(databaseConnection.getConnection(), 
+                customerView.getOrder().getOrderID(),
+                "Confirmed");
+        } 
+        catch (SQLException ex) {
+            JOptionPane.showMessageDialog(this, "Error getting bank details " + ex.getMessage());
+            return;
+        } 
+        finally {
+            databaseConnection.closeConnection();
+        }
+
+        // Display success
+        JOptionPane.showMessageDialog(this, "Your order has been confirmed, thank you!");
     }
 }
