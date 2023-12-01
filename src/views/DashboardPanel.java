@@ -8,7 +8,7 @@ import models.business.Account;
 import views.Manager.ManagerView;
 import views.Staff.StaffView;
 import views.customer.ProductViewPanel;
-
+import views.customer.AccountSettingsPanel;
 import views.customer.OrderHistoryPanel;
 
 // Parent panel for the dashboard for customers, staff and managers
@@ -63,8 +63,7 @@ class DashboardPanel extends JPanel {
     }
 
     public void switchToAccountSettingsView() {
-        // TODO: Implement account settings panel
-        switchToPanelView(new JPanel());
+        switchToPanelView(new AccountSettingsPanel(parentFrame, account));
     }
 
 

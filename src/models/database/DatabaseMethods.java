@@ -996,4 +996,62 @@ public final class DatabaseMethods {
 
     }
 
+    public HolderAddress getCurrentAddress(Connection connection, int holderID) throws SQLException {
+        String query = "SELECT HolderAddress.houseNum, roadName, cityName, HolderAddress.postcode FROM HolderAddress "
+                     + "JOIN AccountHolder ON HolderAddress.houseNum = AccountHolder.houseNum AND "
+                     + "HolderAddress.postcode = AccountHolder.postcode "
+                     + "WHERE AccountHolder.holderID = ?";
+        try (PreparedStatement statement = connection.prepareStatement(query)) {
+            statement.setInt(1, holderID);
+            ResultSet resultSet = statement.executeQuery();
+            if (resultSet.next()) {
+                return new HolderAddress(
+                    resultSet.getString("houseNum"),
+                    resultSet.getString("roadName"),
+                    resultSet.getString("cityName"),
+                    resultSet.getString("postcode")
+                );
+            }
+        }
+        return null;
+    }
+    
+
+    public void updateAccountDetails(Connection connection, Account account) throws SQLException {
+        String updateQuery = "UPDATE Account SET email = ? WHERE userID = ?";
+        try (PreparedStatement statement = connection.prepareStatement(updateQuery)) {
+            statement.setString(1, account.getEmail());
+            statement.setInt(2, account.getUserID());
+            statement.executeUpdate();
+        }
+    }
+
+    public void updateAccountHolderDetails(Connection connection, AccountHolder holder, HolderAddress newAddress) throws SQLException {
+        String updateQuery = "UPDATE AccountHolder SET forename = ?, surname = ?, houseNum = ?, postcode = ? WHERE holderID = ?";
+        try (PreparedStatement statement = connection.prepareStatement(updateQuery)) {
+            statement.setString(1, holder.getForename());
+            statement.setString(2, holder.getSurname());
+            statement.setString(3, newAddress.getHouseNum());
+            statement.setString(4, newAddress.getPostcode());
+            statement.setInt(5, holder.getHolderID());
+            statement.executeUpdate();
+        }
+    }
+    
+    
+    public void updateAddressDetails(Connection connection, HolderAddress newAddress, String oldHouseNum, String oldPostcode) throws SQLException {
+        String updateQuery = "UPDATE HolderAddress SET houseNum = ?, roadName = ?, cityName = ?, postcode = ? WHERE houseNum = ? AND postcode = ?";
+        try (PreparedStatement statement = connection.prepareStatement(updateQuery)) {
+            statement.setString(1, newAddress.getHouseNum());
+            statement.setString(2, newAddress.getRoadName());
+            statement.setString(3, newAddress.getCityName());
+            statement.setString(4, newAddress.getPostcode());
+            statement.setString(5, oldHouseNum);
+            statement.setString(6, oldPostcode);
+            statement.executeUpdate();
+        }
+    }
+    
+    
+
 }

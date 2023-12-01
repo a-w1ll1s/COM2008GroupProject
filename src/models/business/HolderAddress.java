@@ -28,15 +28,15 @@ public class HolderAddress {
     }
 
     public void setRoadName(String newRoadName) {
-        this.houseNum = newRoadName;
+        this.roadName = newRoadName;
     }
 
     public void setCityName(String newCityName) {
-        this.houseNum = newCityName;
+        this.cityName = newCityName;
     }
 
     public void setPostcode(String newPostcode) {
-        this.houseNum = newPostcode;
+        this.postcode = newPostcode;
     }
 
     //Getters
