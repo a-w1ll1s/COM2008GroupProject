@@ -24,8 +24,7 @@ CREATE TABLE `AccountHolder` (
   PRIMARY KEY (`holderID`),
   KEY `houseNum_idx` (`houseNum`),
   KEY `postcode_idx` (`postcode`),
-  CONSTRAINT `houseNum` FOREIGN KEY (`houseNum`) REFERENCES `HolderAddress` (`houseNum`),
-  CONSTRAINT `postcode` FOREIGN KEY (`postcode`) REFERENCES `HolderAddress` (`postcode`)
+  CONSTRAINT fk_houseNum_postcode FOREIGN KEY (houseNum, postcode) REFERENCES HolderAddress (houseNum, postcode);
 )
 
 CREATE TABLE `BankDetails` (

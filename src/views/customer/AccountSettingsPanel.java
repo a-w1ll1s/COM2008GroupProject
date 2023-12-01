@@ -114,22 +114,16 @@ public class AccountSettingsPanel extends JPanel {
         address.setCityName(cityNameField.getText());
         address.setPostcode(postcodeField.getText());
     
-        
-
-        // Database connection
         // Database connection and methods
         DatabaseConnection databaseConnection = new DatabaseConnection();
-
+    
         try {
             // Open database connection
             databaseConnection.openConnection();
             Connection connection = databaseConnection.getConnection();
-
-            // Start transaction
-            connection.setAutoCommit(false);
-
+    
             DatabaseMethods databaseMethods = new DatabaseMethods();
-
+    
             // Assuming 'account' is an instance of a class that has a 'getHolder()' method returning an AccountHolder object
             AccountHolder holder = account.getHolder();
             HolderAddress newAddress = new HolderAddress(
@@ -138,44 +132,30 @@ public class AccountSettingsPanel extends JPanel {
                 cityNameField.getText(),
                 postcodeField.getText()
             );
-            
-            // Get old address details for comparison
-            String oldHouseNum = holder.getAddress().getHouseNum();
-            String oldPostcode = holder.getAddress().getPostcode();
-            
-            // Call update methods
-            databaseMethods.updateAccountHolderDetails(connection, holder, newAddress);
-            databaseMethods.updateAddressDetails(connection, newAddress, oldHouseNum, oldPostcode);
-            databaseMethods.updateAccountDetails(connection, account);            
-
-            // Commit transaction
-            connection.commit();
+    
+            HolderAddress oldAddress = databaseMethods.getCurrentAddress(connection, holder.getHolderID());
+            if (oldAddress == null) {
+                // Handle the case where the old address is not found
+                JOptionPane.showMessageDialog(this, "Old address not found.");
+                return;
+            }
+            String oldHouseNum = oldAddress.getHouseNum();
+            String oldPostcode = oldAddress.getPostcode();
+    
+            databaseMethods.updateAccountAndAddressDetails(connection, account, holder, newAddress, oldHouseNum, oldPostcode);
 
             // Notify user of successful update
             JOptionPane.showMessageDialog(this, "Account details updated successfully!");
-
+    
         } catch (SQLException ex) {
-            // Rollback transaction in case of error
-            if (databaseConnection != null) {
-                try {
-                    databaseConnection.getConnection().rollback();
-                } catch (SQLException rollbackEx) {
-                    JOptionPane.showMessageDialog(this, "Error during rollback: " + rollbackEx.getMessage());
-                }
-            }
-
             // Notify user of error
             JOptionPane.showMessageDialog(this, "Error updating account details: " + ex.getMessage());
         } finally {
-            // Reset default auto-commit behavior and close connection
+            // Close connection
             if (databaseConnection != null) {
-                try {
-                    databaseConnection.getConnection().setAutoCommit(true);
-                } catch (SQLException e) {
-                    JOptionPane.showMessageDialog(this, "Error resetting auto-commit: " + e.getMessage());
-                }
                 databaseConnection.closeConnection();
             }
         }
     }
+    
 }
