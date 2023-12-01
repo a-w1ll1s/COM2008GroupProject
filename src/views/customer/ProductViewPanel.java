@@ -97,7 +97,7 @@ public class ProductViewPanel extends JPanel {
         }
         catch (Exception e) {}
 
-        selectedCategory = new ExpandableCategoryPanel(this, null, category);
+        selectedCategory = new ExpandableCategoryPanel(this, category);
         selectedCategory.setBackground(Color.YELLOW);
 
         GridBagConstraints expandableCategoryPanelConstraints = new GridBagConstraints();

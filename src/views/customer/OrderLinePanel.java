@@ -54,16 +54,7 @@ public class OrderLinePanel extends JPanel {
                     Order order = customerView.getOrder();
 
                     if (newQuantity == 0) {
-                        // We remove all the items so delete.
-                        order.deleteOrderLine(orderLine.getLineNum());
-                        customerView.setOrder(order);
-
-                        DatabaseMethods.deleteOrderLine(databaseConnection.getConnection(), 
-                            order.getOrderID(), orderLine.getLineNum());
-
-                        orderPanel.displayOrderDetails();
-                        orderPanel.displayOrderContents();
-
+                        orderPanel.removeFromOrder(orderLine);
                         return;
                     }
 

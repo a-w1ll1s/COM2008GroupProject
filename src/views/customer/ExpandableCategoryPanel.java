@@ -29,9 +29,8 @@ class ExpandableCategoryPanel extends JPanel {
     private String category;
     private Product selectedProduct;
     
-    public ExpandableCategoryPanel(ProductViewPanel parentPanel, Account account, String category) {       
+    public ExpandableCategoryPanel(ProductViewPanel parentPanel, String category) {       
         this.parentPanel = parentPanel;
-        this.account = account;
         this.category = category;
 
         setLayout(new GridBagLayout());
