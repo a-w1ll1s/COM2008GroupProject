@@ -1,5 +1,6 @@
 package views.customer;
 
+import java.awt.BorderLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.sql.SQLException;
@@ -33,9 +34,11 @@ public class OrderHistoryPanel extends JPanel {
         this.customerView = customerView;      
         this.account = account;
 
+        setLayout(new BorderLayout());
+
         updateOrderHistory();
 
-        add(new JScrollPane(getOrderTable()));
+        add(new JScrollPane(getOrderTable()), BorderLayout.CENTER);
     }
 
     private void updateOrderHistory() {
@@ -67,15 +70,28 @@ public class OrderHistoryPanel extends JPanel {
     private JTable getOrderTable() {
 
         DefaultTableModel model = new DefaultTableModel();
+        model.addColumn("Order ID");
+        model.addColumn("Date");
+        model.addColumn("Products");
+        model.addColumn("Price");
 
         for (Order order : orderHistory) {
-            model.addRow(new Object[]{order.toString()}); 
+            Object[] row = new Object[4];
+            row[0] = order.getOrderID();
+            row[1] = order.getDate();
+
+            String products = "";
             for (OrderLine line : order.getOrderLines()) {
-                model.addRow(new Object[]{line.toString()});
+                products += line.getQuantity()+"x "+line.getProduct().getName() + ", ";
             }
+            row[2] = products;
+            row[3] = "£" + order.getOrderCost();
+
+            model.addRow(row);
         }
 
         JTable orders = new JTable(model);
+        orders.getColumnModel().getColumn(2).setPreferredWidth(900);
 
         return orders;
     }
