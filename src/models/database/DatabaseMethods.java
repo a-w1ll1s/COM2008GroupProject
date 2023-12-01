@@ -701,10 +701,10 @@ public final class DatabaseMethods {
         }
     }
 
-    public static ArrayList<Order> getPendingOrders(Connection connection) throws SQLException {
+    public static ArrayList<Order> getConfirmedOrders(Connection connection) throws SQLException {
         ArrayList<Order> pendingOrders = new ArrayList<>();
 
-        String orderQuery = "SELECT * FROM `Order` WHERE status = 'Pending'";
+        String orderQuery = "SELECT * FROM `Order` WHERE status = 'Confirmed'";
         try (PreparedStatement orderStatement = connection.prepareStatement(orderQuery)) {
             ResultSet orderResultSet = orderStatement.executeQuery();
 
@@ -777,21 +777,6 @@ public final class DatabaseMethods {
             preparedStatement.setString(1, accountNumber);
             preparedStatement.setString(2, sortCode);
             preparedStatement.setString(3, bankName);
-            preparedStatement.setInt(4, holderID);
-    
-            preparedStatement.executeUpdate();
-        } catch (SQLException e) {
-            e.printStackTrace();
-            throw e;
-        }
-    }
-
-    public static void editBankDetails(Connection connection, int cardNum, int newSortCode, String newBankName, int holderID) throws SQLException {
-        String updateStatement = "UPDATE BankDetails SET sortCode = ?, bankName = ? WHERE accountNumber = ? AND holderID = ?";
-        try (PreparedStatement preparedStatement = connection.prepareStatement(updateStatement)) {
-            preparedStatement.setString(1, newSortCode);
-            preparedStatement.setString(2, newBankName);
-            preparedStatement.setString(3, accountNumber);
             preparedStatement.setInt(4, holderID);
     
             preparedStatement.executeUpdate();

@@ -34,7 +34,7 @@ public class StaffView extends JPanel {
         setLayout(new BorderLayout());
 
         JTabbedPane tabbedPane = new JTabbedPane();
-        tabbedPane.add("Pending Orders", new PendingOrderQueueView(parentFrame));
+        tabbedPane.add("Confirmed Orders", new PendingOrderQueueView(parentFrame));
         tabbedPane.add("Edit Products", new StaffProductViewPanel(parentFrame));
         tabbedPane.add("Order History", new StaffOrderHistoryPanel(parentFrame));
         add(tabbedPane, BorderLayout.CENTER);

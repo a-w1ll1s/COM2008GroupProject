@@ -29,7 +29,7 @@ public class PendingOrderQueueView extends JPanel {
         DatabaseConnection databaseConnection = new DatabaseConnection();
         try {
             databaseConnection.openConnection();
-            this.orders = DatabaseMethods.getPendingOrders(databaseConnection.getConnection());
+            this.orders = DatabaseMethods.getConfirmedOrders(databaseConnection.getConnection());
         } catch (SQLException ex) {
             JOptionPane.showMessageDialog(parentFrame, "Error fulfilling order: " + ex.getMessage());
         } finally {
@@ -101,7 +101,7 @@ public class PendingOrderQueueView extends JPanel {
         DatabaseConnection databaseConnection = new DatabaseConnection();
         try {
             databaseConnection.openConnection();
-            ArrayList<Order> updatedOrders = DatabaseMethods.getPendingOrders(databaseConnection.getConnection());
+            ArrayList<Order> updatedOrders = DatabaseMethods.getConfirmedOrders(databaseConnection.getConnection());
             orderTable.setModel(new OrderTableModel(updatedOrders));
             this.orders = updatedOrders;
         } catch (SQLException ex) {
