@@ -11,12 +11,14 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 
 import javax.swing.BoxLayout;
+import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
+import javax.swing.border.EmptyBorder;
 import javax.swing.text.View;
 
 import helpers.ViewHelpers;
@@ -29,7 +31,6 @@ import models.business.Order;
 import models.business.OrderLine;
 import models.database.DatabaseConnection;
 import models.database.DatabaseMethods;
-import views.CustomStyleConstants;
 
 class OrderPanel extends JPanel {
     private Customer customer; 
@@ -42,11 +43,10 @@ class OrderPanel extends JPanel {
     public OrderPanel(CustomerView customerView, Customer customer) {
         this.customerView = customerView;
         this.customer = customer;
-        setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+        setLayout(new GridBagLayout());
 
         // Try get existing bank details
         updateBankDetails();
-
 
         displayPanel = new JPanel();
         displayPanel.setLayout(new GridBagLayout());
@@ -65,7 +65,7 @@ class OrderPanel extends JPanel {
 
             if (bankDetails != null) {
                 customer.addBankDetails(bankDetails);
-            }            
+            }
         } 
         catch (SQLException ex) {
             JOptionPane.showMessageDialog(this, "Error getting bank details " + ex.getMessage());
@@ -104,7 +104,13 @@ class OrderPanel extends JPanel {
         displayPanel.add(new JLabel("Name: " + holder.getName()), ViewHelpers.getGridBagConstraints(0, row));
         row++;
         
-        displayPanel.add(new JLabel("Date: " + Integer.toString(order.getDate())), ViewHelpers.getGridBagConstraints(0, row));
+        String dateString = Integer.toString(order.getDate());
+        String formattedDate = String.format("%s/%s/%s", 
+            dateString.substring(0, 2),
+            dateString.substring(2, 4),
+            dateString.substring(4));
+
+        displayPanel.add(new JLabel("Date: " + formattedDate), ViewHelpers.getGridBagConstraints(0, row));
         row++;
 
         displayPanel.add(new JLabel("Total Price: £" + Integer.toString(order.getOrderCost())),
@@ -168,17 +174,31 @@ class OrderPanel extends JPanel {
             bankSecurityCodeTextField.setText(Integer.toString(bankDetails.getSecurityCode()));
         }
 
-        JLabel contentsLabel = new JLabel("Contents");
-        contentsLabel.setFont(boldFont);
-        GridBagConstraints contentsLabelConstraints = ViewHelpers.getGridBagConstraints(0, row);
-        contentsLabelConstraints.insets = new Insets(5, 0, 0, 0);
-        displayPanel.add(contentsLabel, contentsLabelConstraints);
+        JButton purchaseButton = new JButton("Purchase");
+        purchaseButton.addActionListener(e -> {
+
+        });
+
+        purchaseButton.setFont(boldFont);
+        GridBagConstraints purchaseButtonConstraints = ViewHelpers.getGridBagConstraints(0, row);
+        purchaseButtonConstraints.insets = new Insets(5, 0, 0, 0);
+        displayPanel.add(purchaseButton, purchaseButtonConstraints);
+
 
         displayPanel.revalidate();
         displayPanel.repaint();
         displayPanel.setVisible(true);
 
-        add(displayPanel);
+        GridBagConstraints displayPanelConstraints = new GridBagConstraints();
+        displayPanelConstraints.gridx = 0;
+        displayPanelConstraints.gridy = 0;
+        displayPanelConstraints.weightx = 1;
+        displayPanelConstraints.weighty = 1;
+        displayPanelConstraints.fill = GridBagConstraints.BOTH;
+
+        
+
+        add(displayPanel, displayPanelConstraints);
     }
 
     public void displayOrderContents() {
@@ -194,10 +214,12 @@ class OrderPanel extends JPanel {
             if (line == null)
                 continue;
 
-            GridBagConstraints constraints = ViewHelpers.getGridBagConstraints(0, i);
-            constraints.fill = GridBagConstraints.BOTH;
+            GridBagConstraints constraints = new GridBagConstraints();
+            constraints.fill = GridBagConstraints.HORIZONTAL;
             constraints.weightx = 1;
-            constraints.weighty = 1;
+            constraints.gridy = i;
+            constraints.anchor = GridBagConstraints.NORTH;
+            
             contentsPanel.add(new OrderLinePanel(customerView, this, line), constraints);
             i++;
         }
@@ -206,7 +228,17 @@ class OrderPanel extends JPanel {
         contentsPanel.repaint();
         contentsPanel.setVisible(true);
 
-        add(new JScrollPane(contentsPanel));
+        GridBagConstraints scrollPaneConstraints = new GridBagConstraints();
+        scrollPaneConstraints.anchor = GridBagConstraints.NORTHWEST;
+        scrollPaneConstraints.gridx = 1;
+        scrollPaneConstraints.gridy = 0;
+        scrollPaneConstraints.weightx = 1;
+        scrollPaneConstraints.weighty = 1;
+        scrollPaneConstraints.fill = GridBagConstraints.BOTH;
+        
+        JScrollPane scrollPane = new JScrollPane(contentsPanel);
+        scrollPane.setBorder(new EmptyBorder(new Insets(10, 10, 10, 10)));
+        add(scrollPane, scrollPaneConstraints);
     }
 
     public void removeFromOrder(OrderLine orderLine) {
@@ -237,7 +269,11 @@ class OrderPanel extends JPanel {
         order.setOrderLines(newLines);
         customerView.setOrder(order);
         
+        removeAll();
         displayOrderDetails();
         displayOrderContents();
+        revalidate();
+        repaint();
+        setVisible(true);
     }
 }

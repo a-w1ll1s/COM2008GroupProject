@@ -1006,9 +1006,15 @@ public final class DatabaseMethods {
 
         ArrayList<OrderLine> orderLines = getOrderLinesForOrder(connection, orderID);
         int lineID = -1;
+        int maxLineID = -1;
         for (int i = 0; i < orderLines.size(); ++i) {
             if (orderLines.get(i).getProduct().getProductID() == product.getProductID()) {
-                lineID = i;
+                lineID = orderLines.get(i).getLineNum();
+                if (lineID > maxLineID) {
+                    maxLineID = lineID;
+                }
+                
+                System.out.println(orderLines.get(i).getProduct().getName());
                 break;
             }
         }
@@ -1017,7 +1023,10 @@ public final class DatabaseMethods {
             // If we didn't find an existing order line
             if (lineID == -1) {
                 
-                lineID = orderLines.size();
+                lineID = maxLineID + 1;
+
+
+
                 System.out.println("new lineID + " + lineID);
 
                 String insertStatement = "INSERT INTO `Order Line` (lineID, orderID, productID, quantity) "

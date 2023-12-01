@@ -127,6 +127,10 @@ public class CustomerProductViewPanel extends JPanel {
             @Override
             public void stateChanged(ChangeEvent e) {
                 int newQuantity = (int)((JSpinner)e.getSource()).getValue();
+
+                if (productViewPanel.getSelectedProductID() == -1) {
+                    return;
+                }
                 
                 DatabaseConnection databaseConnection = new DatabaseConnection();
                 try {

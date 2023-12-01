@@ -2,6 +2,8 @@ package views;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.sql.SQLException;
 
 import javax.swing.*;
@@ -136,10 +138,18 @@ class RegisterPanel extends JPanel {
         
         entryPanel.add(houseNumberLabel, houseNumberLabelConstraints);
     
-        houseNumberTextField = new JTextField(12);
+        houseNumberTextField = new JTextField(10);
+        houseNumberTextField.addKeyListener(new KeyAdapter() {
+            public void keyTyped(KeyEvent e) { 
+                if (houseNumberTextField.getText().length() >= 10 )
+                    e.consume(); 
+            }
+        });
+
         GridBagConstraints houseNumberTextFieldConstraints = ViewHelpers.getGridBagConstraints(0, 9);
         houseNumberTextFieldConstraints.insets = leftSideTextFieldInsets;
         entryPanel.add(houseNumberTextField, houseNumberTextFieldConstraints);
+        
 
         // Postcode entry
         JLabel postcodeLabel = new JLabel("Postcode");
@@ -147,7 +157,13 @@ class RegisterPanel extends JPanel {
         postcodeLabelConstraints.insets = labelInsets;
         entryPanel.add(postcodeLabel, postcodeLabelConstraints);
     
-        postcodeTextField = new JTextField(12);
+        postcodeTextField = new JTextField(10);
+        postcodeTextField.addKeyListener(new KeyAdapter() {
+            public void keyTyped(KeyEvent e) { 
+                if (postcodeTextField.getText().length() >= 10 )
+                    e.consume(); 
+            }
+        });
         GridBagConstraints postcodeTextFieldConstraints = ViewHelpers.getGridBagConstraints(1, 9);
         entryPanel.add(postcodeTextField, postcodeTextFieldConstraints);
 
