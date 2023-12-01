@@ -176,7 +176,7 @@ class OrderPanel extends JPanel {
 
         JButton purchaseButton = new JButton("Purchase");
         purchaseButton.addActionListener(e -> {
-
+            tryPurchase();
         });
 
         purchaseButton.setFont(boldFont);
@@ -275,5 +275,27 @@ class OrderPanel extends JPanel {
         revalidate();
         repaint();
         setVisible(true);
+    }
+
+    private void tryPurchase() {
+        if (bankBrandTextField.getText().isBlank()) {
+            JOptionPane.showMessageDialog(this, "You must set a bank brand!");
+            return;
+        }
+
+        if (bankCardNumberTextField.getText().isBlank()) {
+            JOptionPane.showMessageDialog(this, "You must set a bank card number!");
+            return;
+        }
+
+        if (bankExpiryTextField.getText().isBlank()) {
+            JOptionPane.showMessageDialog(this, "You must set a bank expiry date!");
+            return;
+        }
+
+        if (bankSecurityCodeTextField.getText().isBlank()) {
+            JOptionPane.showMessageDialog(this, "You must set a bank security code!");
+            return;
+        }
     }
 }
