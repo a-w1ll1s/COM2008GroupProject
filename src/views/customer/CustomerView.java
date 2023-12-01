@@ -62,6 +62,7 @@ public class CustomerView extends JPanel {
     }
 
     public void switchToProductsView() {
+        productViewPanel.displayOptionsPanel(); // Refresh options panel to reflect new quantity
         switchToPanelView(productViewPanel);
     }
 

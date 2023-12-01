@@ -32,20 +32,71 @@ import models.database.DatabaseMethods;
 import views.CustomStyleConstants;
 
 class OrderPanel extends JPanel {
-    private Order order;
     private Customer customer; 
     private Font boldFont = new Font("", Font.BOLD, 14);
     private JTextField bankBrandTextField, bankExpiryTextField, bankCardNumberTextField, bankSecurityCodeTextField;
     private final int ENTRY_COLUMNS = 15;
-    private JPanel contentsPanel;
+    private JPanel contentsPanel, displayPanel;
     private CustomerView customerView;
 
-    public OrderPanel(CustomerView customerView, Order order, Customer customer) {
+    public OrderPanel(CustomerView customerView, Customer customer) {
         this.customerView = customerView;
-        this.order = order;
         this.customer = customer;
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         setBackground(Color.GREEN);
+
+        // Try get existing bank details
+        updateBankDetails();
+
+
+        displayPanel = new JPanel();
+        displayPanel.setLayout(new GridBagLayout());
+        displayOrderDetails();
+
+        contentsPanel = new JPanel();
+        contentsPanel.setLayout(new GridBagLayout());
+        displayOrderContents();
+        
+        
+
+        /*
+        GridBagConstraints contentsPanelConstraints = ViewHelpers.getGridBagConstraints(0, row);
+        contentsPanelConstraints.fill = GridBagConstraints.BOTH;
+        contentsPanelConstraints.weightx = 1;
+        contentsPanelConstraints.weighty = 1;
+        contentsPanelConstraints.gridwidth = 2;
+        */
+
+        add(new JScrollPane(contentsPanel));
+    }
+    private void updateBankDetails() { 
+        DatabaseConnection databaseConnection = new DatabaseConnection();
+        try {
+            databaseConnection.openConnection();
+            BankDetails bankDetails = DatabaseMethods.getBankDetails(databaseConnection.getConnection(), 
+                customer.getUserID());
+
+            if (bankDetails != null) {
+                customer.addBankDetails(bankDetails);
+            }            
+        } 
+        catch (SQLException ex) {
+            JOptionPane.showMessageDialog(this, "Error getting bank details " + ex.getMessage());
+            return;
+        } 
+        finally {
+            databaseConnection.closeConnection();
+        }
+    }
+
+    public void displayOrderDetails() {
+        Order order = customerView.getOrder();
+
+        if (order.getOrderLines().size() == 0) {
+            customerView.switchToProductsView();
+        }
+
+        displayPanel.removeAll();
 
         int row = 0;
 
@@ -53,9 +104,6 @@ class OrderPanel extends JPanel {
         AccountHolder holder = customer.getHolder();
         HolderAddress address = holder.getAddress();
 
-        JPanel displayPanel = new JPanel();
-        displayPanel.setLayout(new GridBagLayout());
-        
         // Order info
         JLabel titleLabel = new JLabel("Confirm your order");
         titleLabel.setFont(boldFont);
@@ -72,7 +120,7 @@ class OrderPanel extends JPanel {
         displayPanel.add(new JLabel("Date: " + Integer.toString(order.getDate())), ViewHelpers.getGridBagConstraints(0, row));
         row++;
 
-        displayPanel.add(new JLabel("Total Price: " + Integer.toString(order.getOrderCost())),
+        displayPanel.add(new JLabel("Total Price: £" + Integer.toString(order.getOrderCost())),
             ViewHelpers.getGridBagConstraints(0, row));
         row++;
 
@@ -94,9 +142,7 @@ class OrderPanel extends JPanel {
 
         // Bank details
 
-        // Try get existing bank details
-        updateBankDetails();
-
+        
         // Create form for bank details
         JLabel detailsLabel = new JLabel("Bank Details");
         detailsLabel.setFont(boldFont);
@@ -141,52 +187,31 @@ class OrderPanel extends JPanel {
         contentsLabelConstraints.insets = new Insets(5, 0, 0, 0);
         displayPanel.add(contentsLabel, contentsLabelConstraints);
 
-        contentsPanel = new JPanel();
-        contentsPanel.setLayout(new GridBagLayout());
-        
-        row++;
-        displayOrderContents();
-        
-
-        GridBagConstraints contentsPanelConstraints = ViewHelpers.getGridBagConstraints(0, row);
-        contentsPanelConstraints.fill = GridBagConstraints.BOTH;
-        contentsPanelConstraints.weightx = 1;
-        contentsPanelConstraints.weighty = 1;
-        contentsPanelConstraints.gridwidth = 2;
+        displayPanel.revalidate();
+        displayPanel.repaint();
+        displayPanel.setVisible(true);
 
         add(displayPanel);
-        add(new JScrollPane(contentsPanel));
     }
-    private void updateBankDetails() { 
-        DatabaseConnection databaseConnection = new DatabaseConnection();
-        try {
-            databaseConnection.openConnection();
-            BankDetails bankDetails = DatabaseMethods.getBankDetails(databaseConnection.getConnection(), 
-                customer.getUserID());
 
-            if (bankDetails != null) {
-                customer.addBankDetails(bankDetails);
-            }            
-        } 
-        catch (SQLException ex) {
-            JOptionPane.showMessageDialog(this, "Error getting bank details " + ex.getMessage());
-            return;
-        } 
-        finally {
-            databaseConnection.closeConnection();
+    public void displayOrderContents() {
+        if (customerView.getOrder().getOrderLines().size() == 0) {
+            customerView.switchToProductsView();
         }
-    }
 
-    private void displayOrderContents() {
         contentsPanel.removeAll();
 
         int i = 0;
 
-        for (OrderLine line : order.getOrderLines()) {
+        for (OrderLine line : customerView.getOrder().getOrderLines()) {
             if (line == null)
                 continue;
 
-            contentsPanel.add(new OrderLinePanel(customerView, this, line), ViewHelpers.getGridBagConstraints(0, i));
+            GridBagConstraints constraints = ViewHelpers.getGridBagConstraints(0, i);
+            constraints.fill = GridBagConstraints.BOTH;
+            constraints.weightx = 1;
+            constraints.weighty = 1;
+            contentsPanel.add(new OrderLinePanel(customerView, this, line), constraints);
             i++;
         }
 
@@ -196,6 +221,8 @@ class OrderPanel extends JPanel {
     }
 
     public void removeFromOrder(OrderLine orderLine) {
+        Order order = customerView.getOrder();
+
         DatabaseConnection databaseConnection = new DatabaseConnection();
         try {
             databaseConnection.openConnection();
@@ -217,9 +244,10 @@ class OrderPanel extends JPanel {
                 newLines.add(line);
             }
         }
-        System.out.println(order.getOrderLines().size() - newLines.size());
+
         order.setOrderLines(newLines);
         customerView.setOrder(order);
         displayOrderContents();
+        displayOrderDetails();
     }
 }

@@ -33,10 +33,10 @@ public class CustomerProductViewPanel extends JPanel {
         productViewPanel = new ProductViewPanel(this);
 
         add(productViewPanel, productViewPanelConstraints);
-        setupOptionsPanel();
+        displayOptionsPanel();
     }
 
-    private void setupOptionsPanel() {
+    public void displayOptionsPanel() {
         // Options panel
         if (optionsPanel != null)
             remove(optionsPanel);
@@ -71,6 +71,10 @@ public class CustomerProductViewPanel extends JPanel {
 
         JButton addToOrderButton = new JButton("Add to order");
         addToOrderButton.addActionListener(e -> {
+            if (productViewPanel.getSelectedProductID() == -1) {
+                return;
+            }
+            
             addSelectedProductToOrder(); 
             quantitySpinner.setValue(
                 customerView.getOrder().getOrderLine(productViewPanel.getSelectedProductID()).getQuantity());
@@ -90,6 +94,10 @@ public class CustomerProductViewPanel extends JPanel {
             Order order = customerView.getOrder();
             OrderLine orderLine = order.getOrderLine(productViewPanel.getSelectedProductID());
 
+            if (orderLine == null) {
+                return;
+            }
+
             DatabaseConnection databaseConnection = new DatabaseConnection();
             try {
                 databaseConnection.openConnection();
@@ -105,17 +113,11 @@ public class CustomerProductViewPanel extends JPanel {
                 databaseConnection.closeConnection();
             }
 
-            ArrayList<OrderLine> newLines = new ArrayList<>();
-            for (OrderLine line : order.getOrderLines()) {
-                if (line.getLineNum() != orderLine.getLineNum()) {
-                    newLines.add(line);
-                }
-            }
-            order.setOrderLines(newLines);
+            order.deleteOrderLine(orderLine.getLineNum());
             customerView.setOrder(order);
 
             // Must redraw spinner so it does not fire the value changed
-            setupOptionsPanel();
+            displayOptionsPanel();
         });
 
         JLabel quantityLabel = new JLabel("Order Quantity: ");
@@ -220,7 +222,7 @@ public class CustomerProductViewPanel extends JPanel {
     }
 
     public void onSelectedProductChanged() {
-        setupOptionsPanel();
+        displayOptionsPanel();
         if (quantitySpinner == null)
             return;
 

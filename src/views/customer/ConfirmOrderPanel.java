@@ -27,7 +27,7 @@ public class ConfirmOrderPanel extends JPanel {
     }
 
     private void layoutComponents() {
-        OrderPanel orderPanel = new OrderPanel(customerView, order, customer);
+        OrderPanel orderPanel = new OrderPanel(customerView, customer);
 
         GridBagConstraints orderPanelConstraints = new GridBagConstraints();
         orderPanelConstraints.fill = GridBagConstraints.BOTH;

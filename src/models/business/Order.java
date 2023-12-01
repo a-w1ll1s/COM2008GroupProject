@@ -41,6 +41,16 @@ public class Order {
         addOrderLine(orderLine);
     }
 
+    public void deleteOrderLine(int lineID) {
+        ArrayList<OrderLine> newLines = new ArrayList<>();
+        for (OrderLine line : orderLines) {
+            if (line.getLineNum() != lineID) {
+                newLines.add(line);
+            }
+        }
+        orderLines = newLines;
+    }
+
     //Getters
     public int getOrderID() {
         return orderID;

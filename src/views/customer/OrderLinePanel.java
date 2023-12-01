@@ -46,12 +46,27 @@ public class OrderLinePanel extends JPanel {
             @Override
             public void stateChanged(ChangeEvent e) {
                 int newQuantity = (int)((JSpinner)e.getSource()).getValue();
-                
+
                 DatabaseConnection databaseConnection = new DatabaseConnection();
                 try {
                     databaseConnection.openConnection();
 
                     Order order = customerView.getOrder();
+
+                    if (newQuantity == 0) {
+                        // We remove all the items so delete.
+                        order.deleteOrderLine(orderLine.getLineNum());
+                        customerView.setOrder(order);
+
+                        DatabaseMethods.deleteOrderLine(databaseConnection.getConnection(), 
+                            order.getOrderID(), orderLine.getLineNum());
+
+                        orderPanel.displayOrderDetails();
+                        orderPanel.displayOrderContents();
+
+                        return;
+                    }
+
                     OrderLine newOrderLine = DatabaseMethods.createOrUpdateOrderLine(databaseConnection.getConnection(),
                         order.getOrderID(),
                         orderLine.getProduct(),
@@ -66,7 +81,7 @@ public class OrderLinePanel extends JPanel {
                 } 
                 finally {
                     databaseConnection.closeConnection();
-                }                
+                }
             }
         });
 
